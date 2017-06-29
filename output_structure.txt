@@ -1,0 +1,51 @@
+Directory structure of ribopipe output:
+
+YYYY.MM.DD.<ExperimentName>/                                # Step 1: Output directory
+|
+├── rawfastqgz/
+│   ├── <SampleName>_<indexID>_L00[1-4]_R1_001.fastq.gz       # Step 1: Raw input files
+│   └── <ExperimentName>.<SampleName>.fastq.gz                # Step 2: Concatenated input
+│
+├── qualityCheck/                                           # Step 3: FastQC output
+│   ├── <ExperimentName>.<SampleName>.fastQC.html
+│   └── <ExperimentName>.<SampleName>.fastQC.zip
+│
+├── cutadapt/                                               # Step 4: cutadapt adaptor removal
+│   ├── <ExperimentName>.<SampleName>.cutadapt.fastq.gz
+│   ├── <ExperimentName>.<SampleName>.tooShort.fastq.gz
+│   ├── <ExperimentName>.<SampleName>.untrimmed.fastq.gz
+│   └── <ExperimentName>.<SampleName>.cutadapt.report.txt
+│
+├── lengthDistr/                                            # Step 5: Footprint lengths
+│   ├── <ExperimentName>.<SampleName>.cutadapt.fastQC.html
+│   └── <ExperimentName>.<SampleName>.cutadapt.fastQC.zip
+│
+├── highQuality/                                            # Step 6: Sickle quality trimming
+│   ├── <ExperimentName>.<SampleName>.quality.fastq
+│   └── <ExperimentName>.<SampleName>.quality.report.txt
+│
+├── tANDrRNAremoval/                                        # Step 7: Filter rRNA and tRNA
+│   ├── <ExperimentName>.<SampleName>.tANDrRNAdeplete.fastq
+│   ├── <ExperimentName>.<SampleName>.tANDrRNA.sam
+│   └── <ExperimentName>.<SampleName>.tANDrRNAdeplete.report.txt
+│
+├── mapped/                                                 # Step 8: Map reads to genome
+│   ├── <ExperimentName>.<SampleName>.mapped.bwt1
+│   ├── <ExperimentName>.<SampleName>.notmapped.fastq
+│   ├── <ExperimentName>.<SampleName>.moremapped.fastq
+│   └── <ExperimentName>.<SampleName>.report.txt
+│
+├── readcount/                                              # Step 9+10: Total mapped reads
+│   ├── <ExperimentName>.<SampleName>.readCount.p             # Step 9: Output
+│   ├── <ExperimentName>.<SampleName>.readCount.m             # Step 9: Output
+│   └── <ExperimentName>.<SampleName>.totalNbrMappedReads     # Step 10: Grand total
+│
+├── RPM/                                                    # Step 11+12: Calculate RPM
+│   ├── <ExperimentName>.<SampleName>.RPM.p                   # Step 11: Output
+│   ├── <ExperimentName>.<SampleName>.RPM.m                   # Step 11: Output
+│   ├── <ExperimentName>.<SampleName>.RPM0.p                  # Step 12: Output of 11 w. zeros
+│   └── <ExperimentName>.<SampleName>.RPM0.m                  # Step 12: Output of 11 w. zeros
+│
+└── readsPerGene/                                           # Step 13: Read count per gene
+    ├── <ExperimentName>.<SampleName>.readsPerGene.p
+    └── <ExperimentName>.<SampleName>.readsPerGene.m

@@ -3,27 +3,11 @@
 # Ribosome profiling pipeline
 #
 # Authors:
-# Jan Karlsen
-# Johannes Asplund-Samuelsson
+# Jan Karlsen, KTH
+# Johannes Asplund-Samuelsson, KTH
 
 # Input variables
-EXPERIMENT_NAME=""
-THREADS="10"
+# Read input variables from config file
+source $0
 
 # Input files
-
-# Intended directory structure
-#
-# PLACEHOLDER!
-#
-# main_folder/
-# ├── raw/
-# │   ├── one.fastq.gz
-# │   ├── two.fastq.gz
-# │   ├── three.fastq.gz
-# │   └── four.fastq.gz
-# ├── fastqc/
-# │   ├── report.xml
-# │   └── standard_out.txt
-# └── mapped/
-#     └── bowtie1_output.map
