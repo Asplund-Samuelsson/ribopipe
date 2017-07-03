@@ -1,3 +1,5 @@
+#!/usr/bin/python2.7
+
 """
 Supplementary Note 2: Center Weighting
 
@@ -19,11 +21,11 @@ read density file for minus strand
 """
 
 
-def rawdata(inputFile, outputFileP, outputFileM):
-    
+def rawdata(inputFile, outputFileP, outputFileM, min_length, max_length):
+
     pDict = {}
     mDict = {}
-    
+
     inFile = open(inputFile, 'r')
     line = inFile.readline()
     while line != '':
@@ -32,11 +34,11 @@ def rawdata(inputFile, outputFileP, outputFileM):
         col4 = int(fields[4])   #left-most position
         col5 = str(fields[5])   #footprint seq
         length = len(col5)      #footprint length
-                
-        if 22 < length < 49:    #select range of footprint read lengths
+
+        if min_length <= length <= max_length:    #select range of footprint read lengths
             if col2 == '+':	#for plus strand
                 columns = len(fields)   #count number of columns to check if alignment contains mismatches
-                if columns > 8:		
+                if columns > 8:
                     col8 = str(fields[8])
                     if col8.startswith("0"):	#if there is a mismatch in the 1st position
                         length0 = length - 1    #subtract wrong base at 1st position
@@ -62,7 +64,7 @@ def rawdata(inputFile, outputFileP, outputFileM):
                     if elem in pDict:
                         pDict[elem] += (1.0 / centerLength)
                     else:
-                        pDict[elem] = (1.0 / centerLength) 
+                        pDict[elem] = (1.0 / centerLength)
 
             elif col2 == '-':		#for minus strand
                 columns = len(fields)
@@ -73,21 +75,21 @@ def rawdata(inputFile, outputFileP, outputFileM):
                         end3 = col4 + 1         #for minus strand, Bowtie gives leftmost position (3' end) with zero-based numbering
                         end5 = end3 + length0 - 1
                         centerEnd5 = end5 - 11
-                        centerEnd3 = end3 + 11          
+                        centerEnd3 = end3 + 11
                         centerLength = centerEnd5 - centerEnd3 + 1
                     else:
                         end3 = col4 + 1
                         end5 = end3 + length - 1
                         centerEnd5 = end5 - 11
-                        centerEnd3 = end3 + 11            
+                        centerEnd3 = end3 + 11
                         centerLength = centerEnd5 - centerEnd3 + 1
-                else: 
+                else:
                     end3 = col4 + 1
                     end5 = end3 + length - 1
                     centerEnd5 = end5 - 11
-                    centerEnd3 = end3 + 11            
+                    centerEnd3 = end3 + 11
                     centerLength = centerEnd5 - centerEnd3 + 1
-                
+
                 for elem in range(centerEnd3, centerEnd5 + 1):
                     if elem in mDict:
                         mDict[elem] += (1.0 / centerLength)
@@ -95,25 +97,38 @@ def rawdata(inputFile, outputFileP, outputFileM):
                         mDict[elem] = (1.0 / centerLength)
 
         line = inFile.readline()
-    
+
     pList = pDict.items()
     pList.sort()
     outFileP = open(outputFileP, 'w')
     for J in pList:
-        outFileP.write(str(J[0]) + '\t' + str(J[1]) + '\n')        
+        outFileP.write(str(J[0]) + '\t' + str(J[1]) + '\n')
 
     mList = mDict.items()
     mList.sort()
     outFileM = open(outputFileM, 'w')
     for J in mList:
         outFileM.write(str(J[0]) + '\t' + str(J[1]) + '\n')
-        
-            
+
+
 if __name__=='__main__':
-    inputFile = '../mapped/PPE5.E.mapped.bwt'
-    outputFileP = 'PPE5.E.readCount.p'
-    outputFileM = 'PPE5.E.readCount.m'
+    # Parse commandline arguments
+    import argparse
 
-    rawdata(inputFile, outputFileP, outputFileM)
+    parser = argparse.ArgumentParser()
 
+    parser.add_argument('-i', '--infile', help='Input file (bwt).')
+    parser.add_argument('--outP', help='Output file P.')
+    parser.add_argument('--outM', help='Output file M.')
+    parser.add_argument('--min', help='Min. length.', type=int)
+    parser.add_argument('--max', help='Max. length.', type=int)
 
+    args = parser.parse_args()
+
+    inputFile = args.infile
+    outputFileP = args.outP
+    outputFileM = args.outM
+    min_length = args.min
+    max_length = args.max
+
+    rawdata(inputFile, outputFileP, outputFileM, min_length, max_length)

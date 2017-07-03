@@ -1,3 +1,5 @@
+#!/usr/bin/python2.7
+
 """
 Supplementary Note 7: Complete RPM-normalized read densities
 
@@ -13,12 +15,12 @@ RPM-normalized read density file for minus strand (Supplementary Note 6)
     col0: position along genome
     col1: RPM-normalized read density at that position
 
-outputFileP: 
+outputFileP:
 complete RPM-normalized read density file for all positions along the genome on plus strand
     col0: position along genome
     col1: RPM-normalized read density at that position
 
-outputFileM: 
+outputFileM:
 complete RPM-normalized read density file for all positions along the genome on minus strand
     col0: position along genome
     col1: RPM-normalized read density at that position
@@ -27,7 +29,7 @@ complete RPM-normalized read density file for all positions along the genome on 
 
 
 def RPMcomplete(inputFileP, inputFileM, outputFileP, outputFileM):
-    
+
 ### PLUS STRAND###
 
     DictP = {}
@@ -42,18 +44,18 @@ def RPMcomplete(inputFileP, inputFileM, outputFileP, outputFileM):
         line = inFile.readline()
 
     outFile = open(outputFileP, 'w')
-    
+
     for elem in range(1,3573471):          #genome length + 1, change for different genome
         if elem not in DictP:
             DictP[elem] = 0.0
-        
+
     ListP = DictP.items()
     ListP.sort()
-            
+
     for J in ListP:
         outFile.write(str(J[0]) + '\t' + str(J[1]) + '\n')
-       
- 
+
+
 ### MINUS STRAND###
 
     DictM = {}
@@ -68,24 +70,35 @@ def RPMcomplete(inputFileP, inputFileM, outputFileP, outputFileM):
         line = inFile.readline()
 
     outFile = open(outputFileM, 'w')
-    
+
     for elem in range(1,3573471):          #genome length + 1, change for different genome
         if elem not in DictM:
             DictM[elem] = 0.0
-        
+
     ListM = DictM.items()
     ListM.sort()
-            
+
     for J in ListM:
         outFile.write(str(J[0]) + '\t' + str(J[1]) + '\n')
 
 
-            
+
 if __name__=='__main__':
-    inputFileP = ''
-    inputFileM = ''
-    outputFileP = ''
-    outputFileM = ''
+    # Parse commandline arguments
+    import argparse
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--inP', help='Input file P.')
+    parser.add_argument('--inM', help='Input file M.')
+    parser.add_argument('--outP', help='Output file P.')
+    parser.add_argument('--outM', help='Output file M.')
+
+    args = parser.parse_args()
+
+    inputFileP = args.inP
+    inputFileM = args.inM
+    outputFileP = args.outP
+    outputFileM = args.outM
 
     RPMcomplete(inputFileP, inputFileM, outputFileP, outputFileM)
-    

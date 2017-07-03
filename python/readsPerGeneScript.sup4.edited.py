@@ -1,3 +1,5 @@
+#!/usr/bin/python2.7
+
 """
 Supplementary Note 4: Read density per gene
 
@@ -25,14 +27,14 @@ E. coli MC4100 gene list of the minus strand
     col1: start coordinate of gene
     col2: stop coordinate of gene
 
-outputFileP: 
+outputFileP:
 read densities per gene on plus strand
     col0: gene name
     col1: start coordinate of gene
     col2: stop coordinate of gene
     col3: sum of read densities
 
-outputFileM: 
+outputFileM:
 read densities per gene on minus strand
     col0: gene name
     col1: start coordinate of gene
@@ -47,9 +49,9 @@ def expression(inputFileP, inputFileM, inputListP, inputListM, outputFileP, outp
 ### PLUS STRAND ###
 
   # Upload read density file from plus strand as a dictionary
-    
+
     inFileDictP = {}         #create dictionary that looks like input file
-    
+
     inFile = open(inputFileP, 'r')
     line = inFile.readline()
     while line != '':
@@ -58,12 +60,12 @@ def expression(inputFileP, inputFileM, inputListP, inputListM, outputFileP, outp
         col1 = float(fields[1])
         inFileDictP[col0] = col1
         line = inFile.readline()
-        
+
   # Upload plus strand gene list as a dictionary and list
-    
+
     geneDictP = {}         #create dictionary with col0=gene name; col1=read number
     geneListP = []         #create list that looks like input gene list
-    
+
     inFile = open(inputListP, 'r')
     line = inFile.readline()
     while line != '':
@@ -81,32 +83,32 @@ def expression(inputFileP, inputFileM, inputListP, inputListM, outputFileP, outp
             elif Z in inFileDictP:
                 geneDictP[col0] = inFileDictP[Z]
         line = inFile.readline()
-    
+
   # Assign gene expression levels to all genes
-            
-    tupledlistP = geneDictP.items()        
+
+    tupledlistP = geneDictP.items()
     for J in geneListP:
         match = 0
         for K in tupledlistP:
-            if J[0] == K[0]:        
+            if J[0] == K[0]:
                 match = 1
                 J.append(K[1])
         if match == 0:		#list genes that don't have any reads
             J.append(0)
-            
+
   # Output file for plus strand
-    
+
     outFile = open(outputFileP, 'w')
     for J in geneListP:
         outFile.write(str(J[0]) + '\t' + str(J[1]) + '\t' + str(J[2]) + '\t' + str(J[3]) + '\n')
 
-        
-### MINUS STRAND ###     
-    
+
+### MINUS STRAND ###
+
   # Upload read density file from minus strand as a dictionary
-    
+
     inFileDictM = {}
-    
+
     inFile = open(inputFileM, 'r')
     line = inFile.readline()
     while line != '':
@@ -115,12 +117,12 @@ def expression(inputFileP, inputFileM, inputListP, inputListM, outputFileP, outp
         col1 = float(fields[1])
         inFileDictM[col0] = col1
         line = inFile.readline()
-        
+
   # Upload minus strand gene list as a dictionary and list
-    
+
     geneDictM = {}	#create dictionary with col0=gene name; col1=read number
     geneListM = []	#create list that looks like input gene list
-    
+
     inFile = open(inputListM, 'r')
     line = inFile.readline()
     while line != '':
@@ -138,9 +140,9 @@ def expression(inputFileP, inputFileM, inputListP, inputListM, outputFileP, outp
             elif Z in inFileDictM:
                 geneDictM[col0] = inFileDictM[Z]
         line = inFile.readline()
-    
+
   # Assign gene expression levels to all genes
-    
+
     tupledlistM = geneDictM.items()
     for J in geneListM:
         match = 0
@@ -150,22 +152,34 @@ def expression(inputFileP, inputFileM, inputListP, inputListM, outputFileP, outp
                 J.append(K[1])
         if match == 0:
             J.append(0)
-            
+
   # Output file for minus strand
-    
+
     outFile = open(outputFileM, 'w')
     for J in geneListM:
         outFile.write(str(J[0]) + '\t' + str(J[1]) + '\t' + str(J[2]) + '\t' + str(J[3]) + '\n')
 
-    
+
 if __name__ == '__main__':
-    inputFileP = '../readcount/PPE5.E.readcount_p'
-    inputFileM = '../readcount/PPE5.E.readcount_m'
-    inputListP = '../../genelists/pcc6803_genelist_p'
-    inputListM = '../../genelists/pcc6803_genelist_m'
-    outputFileP = 'PPE5.E.RPK_p'
-    outputFileM = 'PPE5.E.RPK_m'
+    # Parse commandline arguments
+    import argparse
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--inP', help='Input file P.')
+    parser.add_argument('--inM', help='Input file M.')
+    parser.add_argument('--listP', help='Input list P.')
+    parser.add_argument('--listM', help='Input list M.')
+    parser.add_argument('--outP', help='Output file P.')
+    parser.add_argument('--outM', help='Output file M.')
+
+    args = parser.parse_args()
+
+    inputFileP = args.inP
+    inputFileM = args.inM
+    inputListP = args.listP
+    inputListM = args.listM
+    outputFileP = args.outP
+    outputFileM = args.outM
 
     expression(inputFileP, inputFileM, inputListP, inputListM, outputFileP, outputFileM)
-
-    

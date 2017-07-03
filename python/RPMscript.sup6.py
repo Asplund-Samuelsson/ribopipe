@@ -1,3 +1,5 @@
+#!/usr/bin/python2.7
+
 """
 Supplementary Note 6: RPM-normalized read densities
 
@@ -16,12 +18,12 @@ read density file for minus strand (Supplementary Note 2)
 inputNumber:
 total read number as float (Supplementary Note 3)
 
-outputFileP: 
+outputFileP:
 RPM-normalized read density file for plus strand
     col0: position along genome
     col1: RPM-normalized read density at that position
 
-outputFileM: 
+outputFileM:
 RPM-normalized read density file for minus strand
     col0: position along genome
     col1: RPM-normalized read density at that position
@@ -34,7 +36,7 @@ def norm(inputFileP, inputFileM, inputNumber, outputFileP, outputFileM):
 ### PLUS STRAND ###
 
     inFile = open(inputFileP, 'r')
-    inNumber = open(inputNumber, 'r') 
+    inNumber = open(inputNumber, 'r')
     outFile = open(outputFileP, 'w')
 
     line = inFile.readline()
@@ -54,7 +56,7 @@ def norm(inputFileP, inputFileM, inputNumber, outputFileP, outputFileM):
 ### MINUS STRAND ###
 
     inFile = open(inputFileM, 'r')
-    inNumber = open(inputNumber, 'r') 
+    inNumber = open(inputNumber, 'r')
     outFile = open(outputFileM, 'w')
 
     line = inFile.readline()
@@ -71,12 +73,25 @@ def norm(inputFileP, inputFileM, inputNumber, outputFileP, outputFileM):
         line = inFile.readline()
 
 
-            
+
 if __name__=='__main__':
-    inputFileP = ''
-    inputFileM = ''
-    inputNumber = ''
-    outputFileP = ''
-    outputFileM = ''
+    # Parse commandline arguments
+    import argparse
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--inP', help='Input file P.')
+    parser.add_argument('--inM', help='Input file M.')
+    parser.add_argument('--number', help='Input number.')
+    parser.add_argument('--outP', help='Output file P.')
+    parser.add_argument('--outM', help='Output file M.')
+
+    args = parser.parse_args()
+
+    inputFileP = args.inP
+    inputFileM = args.inM
+    inputNumber = args.number
+    outputFileP = args.outP
+    outputFileM = args.outM
 
     norm(inputFileP, inputFileM, inputNumber, outputFileP, outputFileM)

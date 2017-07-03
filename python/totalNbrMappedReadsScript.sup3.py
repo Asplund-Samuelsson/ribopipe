@@ -1,3 +1,5 @@
+#!/usr/bin/python2.7
+
 """
 Supplementary Note 3: Total reads
 
@@ -13,7 +15,7 @@ read density file for minus strand (Supplementary Note 2)
     col0: position along genome
     col1: read density at that position
 
-outputFile: 
+outputFile:
 total read number as float
 
 """
@@ -47,12 +49,22 @@ def countReads(inputFileP,inputFileM, outputFile):
 
     totalReads = i + j
     outFile.write(str(totalReads))
-        
-        
+
+
 if __name__ == '__main__':
-    inputFileP = ''
-    inputFileM = ''
-    outputFile = ''
+    # Parse commandline arguments
+    import argparse
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--inP', help='Input file P.')
+    parser.add_argument('--inM', help='Input file M.')
+    parser.add_argument('--out', help='Output file.')
+
+    args = parser.parse_args()
+
+    inputFileP = args.inP
+    inputFileM = args.inM
+    outputFile = args.out
 
     countReads(inputFileP,inputFileM, outputFile)
-
