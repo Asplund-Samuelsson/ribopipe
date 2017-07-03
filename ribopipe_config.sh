@@ -4,6 +4,7 @@
 EXPERIMENT_NAME="ExperimentName"
 OUTDIR="YYYY.MM.DD.${EXPERIMENT_NAME}"
 THREADS="16"
+START_STEP=1 # Auto-stop after step 5 unless skipped. Continue from step 6.
 
 # Step-specific options
 
