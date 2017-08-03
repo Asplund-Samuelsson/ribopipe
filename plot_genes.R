@@ -9,6 +9,10 @@ indir = args[1] # A ribopipe results directory
 genes = args[2] # Gene name(s); slr1834,sll1234, or interval; 8001-9001
 outfile = args[3] # Output plot in PDF format
 
+# TESTING
+#indir="/ssd/jan/ribprof/seqdata/2017.03.29.PPE5/"
+#genes="slr1329,sll1580,slr1908,sll1694"
+#outfile="/tmp/ribopipe_plot.pdf"
 
 ### FILENAMES, SAMPLE IDS AND STRAND IDS #######################################
 
@@ -99,9 +103,20 @@ for( i in seq(1:(nrow(gdat)))){
 # Merge with RPM data
 grpm = merge(gdat_exp, rpm)
 
-gp = ggplot(grpm, aes(x=Position, y=RPM, fill=Strand))
+# Facilitate reversing order of positions in minus strand by multiplying with -1
+grpm$Position = ifelse(grpm$Strand == "m", grpm$Position * -1, grpm$Position)
+
+# Calculate minimum (=start) position per gene
+mins = aggregate(Position ~ Name, grpm, min)
+colnames(mins)[2] = "MinPosition"
+grpm = merge(grpm, mins)
+
+# Calculate gene positions
+grpm$GenePosition = grpm$Position - grpm$MinPosition + 1
+
+gp = ggplot(grpm, aes(x=GenePosition, y=RPM, fill=Strand))
 gp = gp + geom_bar(position=position_dodge(), stat="identity")
 gp = gp + theme_bw()
-gp = gp + facet_grid(Sample~Name, scales="free_x")
-gp = gp + theme(axis.text.x = element_text(angle = 45, hjust=1, vjust=1))
+gp = gp + facet_grid(Sample~Name, scales="free_x", space="free_x")
+gp = gp + theme(axis.text.x = element_text(angle = 60, hjust=1, vjust=1))
 ggsave(outfile, gp, width=210/25.4, height=210/25.4)
