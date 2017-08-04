@@ -152,8 +152,6 @@ if (tolower(plot_type) == "operon"){
     # Get genes from specified range
     genes_full_range = as.numeric(unlist(strsplit(genes, ":")))
     gdat = subset(gen, Start >= genes_full_range[1] & End <= genes_full_range[2])
-    gdat_exp = expand.genes(gdat)
-    grpm = merge(gdat_exp, rpm)
   }else{
     # Get range from specified genes
     gene_names = unlist(strsplit(genes, ","))
@@ -162,9 +160,15 @@ if (tolower(plot_type) == "operon"){
       min(c(gdat$Start, gdat$End)) - 100,
       max(c(gdat$Start, gdat$End)) + 100
     )
-    gdat_exp = expand.genes(gdat)
-    grpm = merge(gdat_exp, rpm)
   }
+
+  # Expand gene data and merge with whole range of RPM data
+  gdat_exp = expand.genes(gdat)
+  grpm = merge(
+    gdat_exp,
+    subset(rpm, Position >= genes_full_range[1] & Position <= genes_full_range[2]),
+    all.y=T
+    )
 
   # Create GRanges object
   gene_ranges = unique(gdat[,c("Name", "Start", "End", "Strand")])
@@ -199,6 +203,7 @@ if (tolower(plot_type) == "operon"){
   gp = gp + theme(axis.title.x=element_blank(),
                   axis.text.x=element_blank(),
                   axis.ticks.x=element_blank())
+  gp = gp + xlim(genes_full_range)
   gp_rpm = gp
 
   # Plot genes
@@ -217,6 +222,7 @@ if (tolower(plot_type) == "operon"){
     colour="white", size=2.5
     )
   gp = gp + theme_bw()
+  gp = gp + xlim(genes_full_range)
   gp_genes = gp@ggplot # @ggplot FOR PLOTTING WITH REGULAR GGPLOT OBJECTS
 
   # Align plots
