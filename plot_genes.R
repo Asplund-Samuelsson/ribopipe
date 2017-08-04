@@ -172,6 +172,11 @@ if (tolower(plot_type) == "operon"){
 
   # Create GRanges object
   gene_ranges = unique(gdat[,c("Name", "Start", "End", "Strand")])
+
+  # Check the dominant direction of the genes
+  x_reverse = names(sort(table(gene_ranges$Strand),decreasing=TRUE)[1]) == "m"
+
+  # Add data for plot adjustment
   gene_ranges$Middle = (gene_ranges$Start + gene_ranges$End)/2
   gene_ranges$Y = 1
   gene_ranges$LabelPosition = ifelse(
@@ -179,7 +184,11 @@ if (tolower(plot_type) == "operon"){
     gene_ranges$Start + 10,
     gene_ranges$End - 10
     )
-  gene_ranges$hjust = ifelse(gene_ranges$Strand == "p", "right", "left")
+  if (x_reverse){
+    gene_ranges$hjust = ifelse(gene_ranges$Strand == "p", "right", "left")
+  }else{
+    gene_ranges$hjust = ifelse(gene_ranges$Strand == "p", "left", "right")
+  }
   gr = GRanges(
     seqnames = genes,
     ranges = IRanges(
@@ -197,7 +206,7 @@ if (tolower(plot_type) == "operon"){
   gp = gp + geom_bar(position=position_dodge(), stat="identity")
   gp = gp + theme_bw()
   gp = gp + facet_grid(Sample~.)
-  if(names(sort(table(gene_ranges$Strand),decreasing=TRUE)[1]) == "m"){
+  if(x_reverse){
     gp = gp + scale_x_reverse()
   }
   gp = gp + theme(axis.title.x=element_blank(),
@@ -213,7 +222,7 @@ if (tolower(plot_type) == "operon"){
     range.geom = "rect",
     gap.geom = "segment"
     )
-  if(names(sort(table(gene_ranges$Strand),decreasing=TRUE)[1]) == "m"){
+  if(x_reverse){
     gp = gp + scale_x_reverse()
   }
   gp = gp + geom_text(
