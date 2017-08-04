@@ -210,9 +210,8 @@ if (tolower(plot_type) == "operon"){
   gp = ggplot(gr)
   gp = gp + geom_hline(yintercept=1)
   gp = gp + geom_alignment(
-    range.geom = "arrowrect",
-    gap.geom = "segment",
-    length = 1
+    range.geom = "rect",
+    gap.geom = "segment"
     )
   if(names(sort(table(gene_ranges$Strand),decreasing=TRUE)[1]) == "m"){
     gp = gp + scale_x_reverse()
