@@ -204,7 +204,7 @@ if [[ START_STEP -le S ]]
       prefix="highQuality/${EXPERIMENT_NAME}.${sample_name}"
       out_quality="${prefix}.quality.fastq"
       out_report="${prefix}.quality.report.txt"
-      # Run cutadapt with the supplied options
+      # Run sickle with the supplied options
       sickle se -f $infile -t $sickle_t -q $sickle_q -l $sickle_l \
       -o $out_quality > $out_report
     }

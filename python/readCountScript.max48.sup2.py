@@ -35,6 +35,8 @@ def rawdata(inputFile, outputFileP, outputFileM, min_length, max_length):
         col5 = str(fields[5])   #footprint seq
         length = len(col5)      #footprint length
 
+        center_offset = int((min_length-1)/2) #center for min_length always 1 or 2 nt
+
         if min_length <= length <= max_length:    #select range of footprint read lengths
             if col2 == '+':	#for plus strand
                 columns = len(fields)   #count number of columns to check if alignment contains mismatches
@@ -44,20 +46,20 @@ def rawdata(inputFile, outputFileP, outputFileM, min_length, max_length):
                         length0 = length - 1    #subtract wrong base at 1st position
                         end5 = col4 + 2		#Bowtie uses 0-based offset: transform to 1-based and subtract 1st base
                         end3 = end5 + length0 - 1
-                        centerEnd5 = end5 + 11	#define center
-                        centerEnd3 = end3 - 11
+                        centerEnd5 = end5 + center_offset	#define center
+                        centerEnd3 = end3 - center_offset
                         centerLength = centerEnd3 - centerEnd5 + 1
                     else:
                         end5 = col4 + 1     #Bowtie uses zero-based offset, transform to 1-based
                         end3 = end5 + length - 1
-                        centerEnd5 = end5 + 11
-                        centerEnd3 = end3 - 11
+                        centerEnd5 = end5 + center_offset
+                        centerEnd3 = end3 - center_offset
                         centerLength = centerEnd3 - centerEnd5 + 1
                 else:
                     end5 = col4 + 1
                     end3 = end5 + length - 1
-                    centerEnd5 = end5 + 11
-                    centerEnd3 = end3 - 11
+                    centerEnd5 = end5 + center_offset
+                    centerEnd3 = end3 - center_offset
                     centerLength = centerEnd3 - centerEnd5 + 1
 
                 for elem in range(centerEnd5, centerEnd3 + 1):
@@ -74,20 +76,20 @@ def rawdata(inputFile, outputFileP, outputFileM, min_length, max_length):
                         length0 = length - 1
                         end3 = col4 + 1         #for minus strand, Bowtie gives leftmost position (3' end) with zero-based numbering
                         end5 = end3 + length0 - 1
-                        centerEnd5 = end5 - 11
-                        centerEnd3 = end3 + 11
+                        centerEnd5 = end5 - center_offset
+                        centerEnd3 = end3 + center_offset
                         centerLength = centerEnd5 - centerEnd3 + 1
                     else:
                         end3 = col4 + 1
                         end5 = end3 + length - 1
-                        centerEnd5 = end5 - 11
-                        centerEnd3 = end3 + 11
+                        centerEnd5 = end5 - center_offset
+                        centerEnd3 = end3 + center_offset
                         centerLength = centerEnd5 - centerEnd3 + 1
                 else:
                     end3 = col4 + 1
                     end5 = end3 + length - 1
-                    centerEnd5 = end5 - 11
-                    centerEnd3 = end3 + 11
+                    centerEnd5 = end5 - center_offset
+                    centerEnd3 = end3 + center_offset
                     centerLength = centerEnd5 - centerEnd3 + 1
 
                 for elem in range(centerEnd3, centerEnd5 + 1):
