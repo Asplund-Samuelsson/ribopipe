@@ -11,8 +11,8 @@ plot_type = args[3] # Plot "facets" or "operon"
 outfile = args[4] # Output plot in PDF format
 
 # TESTING
-#indir="/ssd/jan/ribprof/seqdata/2017.03.29.PPE5/"
-#genes="sll1577,sll1578,sll1579,sll1580,ssl3093"
+#indir="/ssd/common/proj/RibosomeProfiling/tsspipe_testing/2017.09.05.CSD2"
+#genes="slr1510,slr1511,sll1418"
 #outfile="/tmp/ribopipe_plot.pdf"
 #plot_type="operon"
 
@@ -74,17 +74,10 @@ colnames(rpm)[1:2] = c("Position", "RPM")
 gen = do.call("rbind", gene_data)
 colnames(gen)[1:4] = c("Name", "Start", "End", "Reads")
 
-
-### LOAD LIBRARIES #############################################################
-
-suppressMessages(library(ggplot2))
-suppressMessages(library(ggbio))
-suppressMessages(library(GenomicRanges))
-library(egg)
-library(ggrepel)
-
-
 ### DEFINE FUNCTIONS ###########################################################
+
+# Load general libraries
+library(ggplot2)
 
 # Expand gene data to every position
 expand.genes = function(gdat){
@@ -149,13 +142,20 @@ if (tolower(plot_type) == "facets"){
   gp = gp + facet_grid(Sample~Name, scales="free_x", space="free_x")
   gp = gp + theme(axis.text.x = element_text(angle = 60, hjust=1, vjust=1))
   gp = gp + colScale
-  ggsave(outfile, gp, width=210/25.4, height=210/25.4)
+  ggsave(outfile, gp, pdf, width=210/25.4, height=210/25.4)
 
 }
 
 ### PLOT GENOMIC RANGE (OPERON) ################################################
 
 if (tolower(plot_type) == "operon"){
+
+  # Load libraries
+  library(ggbio)
+  library(GenomicRanges)
+  library(egg)
+  library(ggrepel)
+  library(plyr)
 
   # Clean up when testing
   if(exists("gr")){rm("gr")}
@@ -229,6 +229,18 @@ if (tolower(plot_type) == "operon"){
 
   # Perform plotting
 
+  # Define breaks
+  x_major_breaks = seq(
+    round_any(genes_full_range[1],1000, f=ceiling),
+    round_any(genes_full_range[2],1000, f=floor),
+    1000
+    )
+  x_minor_breaks = seq(
+    round_any(genes_full_range[1],100, f=ceiling),
+    round_any(genes_full_range[2],100, f=floor),
+    100
+    )
+
   # Plot RPM
   plot_RPM = function(S){
     gp = ggplot(subset(grpm, strand == S), aes(x=Position, y=RPM, fill=strand))
@@ -241,10 +253,16 @@ if (tolower(plot_type) == "operon"){
     gp = gp + facet_grid(Sample~.)
     # Set up x axis
     if(x_reverse){
-      gp = gp + scale_x_reverse(limits=rev(genes_full_range), expand=c(0,0))
+      gp = gp + scale_x_reverse(
+        limits=rev(genes_full_range), expand=c(0,0),
+        breaks=x_major_breaks, minor_breaks=x_minor_breaks
+        )
     }
     if(!x_reverse){
-      gp = gp + scale_x_continuous(limits=genes_full_range, expand=c(0,0))
+      gp = gp + scale_x_continuous(
+        limits=genes_full_range, expand=c(0,0),
+        breaks=x_major_breaks, minor_breaks=x_minor_breaks
+        )
     }
     # Set up y axis
     y_axis_limits = c(0, max(grpm$RPM)*1.05)
@@ -273,9 +291,15 @@ if (tolower(plot_type) == "operon"){
       gap.geom = "segment"
       )
     if(x_reverse){
-      gp = gp + scale_x_reverse(expand=c(0,0))
+      gp = gp + scale_x_reverse(
+        expand=c(0,0),
+        breaks=x_major_breaks, minor_breaks=x_minor_breaks
+        )
     }else{
-      gp = gp + scale_x_continuous(expand=c(0,0))
+      gp = gp + scale_x_continuous(
+        expand=c(0,0),
+        breaks=x_major_breaks, minor_breaks=x_minor_breaks
+        )
     }
     gp = gp + geom_label_repel(
       aes(x=LabelPosition, y=Y, label=Name), gene_ranges,
