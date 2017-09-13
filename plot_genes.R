@@ -249,6 +249,17 @@ if (tolower(plot_type) == "operon"){
     }else{
       gp = gp + geom_bar(position=position_dodge(), stat="identity")
     }
+    if(exists("gr")){
+      # If there is a GenomicRanges object, add vlines indicating gene bounds
+      gr_sub = subset(gr, strand == S)
+      gr_df = as.data.frame(gr_sub@ranges)
+      gene_bounds = c(gr_df$start, gr_df$end)
+      for (position in gene_bounds){
+        gp = gp + geom_vline(
+          xintercept=position, colour="black", size=0.2, alpha=0.8
+          )
+      }
+    }
     gp = gp + theme_bw()
     gp = gp + facet_grid(Sample~.)
     # Set up x axis
