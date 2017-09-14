@@ -140,6 +140,10 @@ if (tolower(plot_type) == "facets"){
   gp = gp + geom_bar(position=position_dodge(), stat="identity")
   gp = gp + theme_bw()
   gp = gp + facet_grid(Sample~Name, scales="free_x", space="free_x")
+  gp = gp + scale_x_continuous(
+    breaks = seq(0, max(grpm$GenePosition), 200),
+    minor_breaks = seq(0, max(grpm$GenePosition), 20)
+    )
   gp = gp + theme(axis.text.x = element_text(angle = 60, hjust=1, vjust=1))
   gp = gp + colScale
   ggsave(outfile, gp, pdf, width=210/25.4, height=210/25.4)
