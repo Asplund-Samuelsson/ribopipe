@@ -172,9 +172,13 @@ if [[ START_STEP -le S ]]
     # Report step done
     echo -e "\n\e[92mStep $S: Done.\e[0m\n"
 
-    # Halt script
-    echo -e "\n\e[33mStep $S: Halting. Check results and modify inputs.\e[0m\n"
-    exit 1
+    
+    if [[ HALT_S5 -eq 1 ]]
+	  then
+	    # Halt script
+   	    echo -e "\n\e[33mStep $S: Halting. Check results and modify inputs.\e[0m\n"
+	    exit 1
+    fi
   else
     # Report skip
     echo -e "\n\e[31mStep $S: Skipping...\e[0m\n"

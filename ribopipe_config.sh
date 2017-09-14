@@ -5,7 +5,7 @@ EXPERIMENT_NAME="ExperimentName"
 OUTDIR="YYYY.MM.DD.${EXPERIMENT_NAME}"
 THREADS="16"
 START_STEP=1 # Auto-stop after step 5 unless skipped. Continue from step 6.
-
+HALT_S5=1
 # Step-specific options
 
 # Step 1: Import data to working directory

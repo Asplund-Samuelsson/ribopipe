@@ -1,11 +1,11 @@
 # Configuration file for the ribosome profiling pipeline
 
 # Universal options
-EXPERIMENT_NAME="CSD2"
+EXPERIMENT_NAME="CSD2D"
 OUTDIR="2017.09.05.${EXPERIMENT_NAME}"
-THREADS="16"
-START_STEP=9 # Auto-stop after step 5 unless skipped. Continue from step 6.
-HALT_S5=1
+THREADS="4"
+START_STEP=1 # Auto-stop after step 5 unless skipped. Continue from step 6.
+HALT_S5=0
 # Step-specific options
 
 # Step 1: Import data to working directory
