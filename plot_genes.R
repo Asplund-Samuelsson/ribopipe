@@ -246,8 +246,17 @@ if (tolower(plot_type) == "operon"){
     )
 
   # Plot RPM
-  plot_RPM = function(S){
-    gp = ggplot(subset(grpm, strand == S), aes(x=Position, y=RPM, fill=strand))
+  plot_RPM = function(S, reverse_facets){
+    # Subset to selected strand
+    plot_data = subset(grpm, strand == S)
+    # Reorder samples if the facet order should be reversed
+    samples = unique(as.character(plot_data$Sample))
+    samples = samples[order(samples)]
+    if (reverse_facets){
+      samples = samples[order(samples, decreasing=T)]
+    }
+    plot_data$Sample = factor(as.character(plot_data$Sample), levels=samples)
+    gp = ggplot(plot_data, aes(x=Position, y=RPM, fill=strand))
     if (S == "+"){
       gp = gp + geom_bar(position=position_dodge(), stat="identity")
     }else{
@@ -293,9 +302,6 @@ if (tolower(plot_type) == "operon"){
                     axis.ticks.x=element_blank())
     return(gp)
   }
-
-  gp_rpm_p = plot_RPM("+")
-  gp_rpm_m = plot_RPM("-")
 
   # Plot genes
   if(exists("gr")){
@@ -357,8 +363,12 @@ if (tolower(plot_type) == "operon"){
   # Align plots
   pdf(outfile, width=210/25.4, height=270/25.4, onefile=FALSE)
   if(!no_dom_dir & x_reverse){
+    gp_rpm_p = plot_RPM("+", reverse_facets=T)
+    gp_rpm_m = plot_RPM("-", reverse_facets=F)
     ggarrange(gp_rpm_m, gp_genes, gp_rpm_p, ncol=1, heights=c(20,2,20))
   }else{
+    gp_rpm_p = plot_RPM("+", reverse_facets=F)
+    gp_rpm_m = plot_RPM("-", reverse_facets=T)
     ggarrange(gp_rpm_p, gp_genes, gp_rpm_m, ncol=1, heights=c(20,2,20))
   }
   dev.off()
