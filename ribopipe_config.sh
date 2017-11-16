@@ -61,5 +61,5 @@ RPMcompleteScript="/ssd/common/tools/ribopipe/python/RPMcompleteScript.NC000911.
 
 # Step 13: Count the number of reads on every gene
 readsPerGeneScript="/ssd/common/tools/ribopipe/python/readsPerGeneScript.sup4.edited.py"
-genelistP="/ssd/jan/ribprof/seqdata/genelists/syn6803.NC000911.genelist_p"
-genelistM="/ssd/jan/ribprof/seqdata/genelists/syn6803.NC000911.genelist_m"
+genelistP="/ssd/jan/auxillaryData/genelists/syn6803.NC000911.genelist_p"
+genelistM="/ssd/jan/auxillaryData/genelists/syn6803.NC000911.genelist_m"
