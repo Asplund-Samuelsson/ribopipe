@@ -210,6 +210,25 @@ if [[ START_STEP -le S ]]
     # Report progress
     echo -e "\n\e[94mStep $S: Mapping reads to the genome...\e[0m\n"
 
+    # Option: Make input reads reverse-complement for e.g. NEBNext Directional
+    if [ "$reverse_complement" = true ]
+      then
+        # Define run_revcomp function to be used with GNU parallel application
+        run_revcomp() {
+          # The infile name is stored in positional argument 1
+          infile=$1
+          # Reverse-complement the input file using seqmagick
+          seqmagick mogrify --reverse-complement $infile
+        }
+
+        # Export function so that each subprocess can access it
+        export -f run_revcomp
+
+        # Run revcomp in parallel for the input files
+        input_files_6=(tANDrRNAremoval/${EXPERIMENT_NAME}.*.tANDrRNAdeplete.fastq)
+        parallel --no-notice --jobs $THREADS run_revcomp ::: ${input_files_6[@]}
+    fi
+
     # Calculate number of threads to use
     # Use lowest number out of THREADS and bowtie_p
     bowtie_6_p=$(dc -e "[${THREADS}]sM ${bowtie_6_p}d ${THREADS}<Mp")

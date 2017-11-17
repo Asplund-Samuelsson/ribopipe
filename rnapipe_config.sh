@@ -32,6 +32,7 @@ bowtie_5_p="10"
 bowtie_5_ref="/ssd/common/tools/bowtie1-1.1.2/indexes/rRNAtRNA.syn6803.NC000911"
 
 # Step 6: Map reads to the genome
+reverse_complement=true # Make input reads reverse-complement for e.g. NEBNext Directional
 bowtie_6_m="1"
 bowtie_6_n="2"
 bowtie_6_l="28"
