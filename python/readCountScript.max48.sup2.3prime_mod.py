@@ -23,7 +23,7 @@ read density file for minus strand
 """
 
 
-def rawdata(inputFile, outputFileP, outputFileM):
+def rawdata(inputFile, outputFileP, outputFileM, min_length, max_length):
 
     pDict = {}
     mDict = {}
@@ -37,25 +37,26 @@ def rawdata(inputFile, outputFileP, outputFileM):
         col5 = str(fields[5])   #read seq
         length = len(col5)      #read length
 
-        if col2 == '+':	#for plus strand
-            end5 = col4 + 1 #Bowtie uses zero-based offset, transform to 1-based
-            end3 = end5 + length - 1
+        # Consider only reads within min and max
+        if min_length <= length <= max_length:
 
-            for elem in range(end5, end3 + 1):
-                if elem in pDict:
-                    pDict[elem] += (1.0 / length)
+            if col2 == '+':	#for plus strand
+                end5 = col4 + 1 #Bowtie uses zero-based offset, transform to 1-based
+                end3 = end5 + length - 1
+                # Assign the 3 prime end of the read to the genome position
+                if end3 in pDict:
+                    pDict[end3] += 1.0
                 else:
-                    pDict[elem] = (1.0 / length)
+                    pDict[end3] = 1.0
 
-        elif col2 == '-': #for minus strand
-            end3 = col4 + 1 #for minus strand, Bowtie gives leftmost position (3' end) with zero-based numbering
-            end5 = end3 + length - 1
-
-            for elem in range(end3, end5 + 1):
-                if elem in mDict:
-                    mDict[elem] += (1.0 / length)
+            elif col2 == '-': #for minus strand
+                end3 = col4 + 1 #for minus strand, Bowtie gives leftmost position (3' end) with zero-based numbering
+                end5 = end3 + length - 1
+                # Assign the 3 prime end of the read to the genome position
+                if end3 in mDict:
+                    mDict[end3] += 1.0
                 else:
-                    mDict[elem] = (1.0 / length)
+                    mDict[end3] = 1.0
 
         line = inFile.readline()
 
@@ -81,13 +82,15 @@ if __name__=='__main__':
     parser.add_argument('-i', '--infile', help='Input file (bwt).')
     parser.add_argument('--outP', help='Output file P.')
     parser.add_argument('--outM', help='Output file M.')
-    parser.add_argument('--min', help='Not used.', type=int) # DUMMY - NOT USED
-    parser.add_argument('--max', help='Not used.', type=int) # DUMMY - NOT USED
+    parser.add_argument('--min', help='Min. length.', type=int)
+    parser.add_argument('--max', help='Max. length.', type=int)
 
     args = parser.parse_args()
 
     inputFile = args.infile
     outputFileP = args.outP
     outputFileM = args.outM
+    min_length = args.min
+    max_length = args.max
 
-    rawdata(inputFile, outputFileP, outputFileM)
+    rawdata(inputFile, outputFileP, outputFileM, min_length, max_length)
