@@ -471,7 +471,7 @@ if [[ START_STEP -le S ]]
 
     # Export function and variables so that each subprocess can access them
     export -f run_genes
-    export readsPerGeneScript genelistP genelistM
+    export readsPerGeneScript genelistP genelistM genomeLength
     export EXPERIMENT_NAME
 
     # Run reads per gene counting in parallel for the input files
