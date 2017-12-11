@@ -63,3 +63,4 @@ RPMcompleteScript="/ssd/common/tools/ribopipe/python/RPMcompleteScript.NC000911.
 readsPerGeneScript="/ssd/common/tools/ribopipe/python/readsPerGeneScript.sup4.edited.py"
 genelistP="/ssd/jan/auxillaryData/genelists/syn6803.NC000911.genelist_p"
 genelistM="/ssd/jan/auxillaryData/genelists/syn6803.NC000911.genelist_m"
+genomeLength="3573470"

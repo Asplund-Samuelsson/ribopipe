@@ -5,6 +5,8 @@ Supplementary Note 4: Read density per gene
 
 Authors: Eugene Oh
 
+Edited by Johannes Asplund-Samuelsson, KTH
+
 inputFileP:
 read density file for plus strand (Supplementary Note 2)
     col0: position along genome
@@ -41,10 +43,14 @@ read densities per gene on minus strand
     col2: stop coordinate of gene
     col3: sum of read densities
 
+genomeLength:
+length of genome sequence for negative gene position handling
+    int
+
 """
 
 
-def expression(inputFileP, inputFileM, inputListP, inputListM, outputFileP, outputFileM):
+def expression(inputFileP, inputFileM, inputListP, inputListM, outputFileP, outputFileM, genomeLength):
 
 ### PLUS STRAND ###
 
@@ -78,6 +84,9 @@ def expression(inputFileP, inputFileM, inputListP, inputListM, outputFileP, outp
   # Sum up and write read densities per protein coding region in dictionary
 
         for Z in range(col1, col2 + 1):
+            if Z < 0:
+                # Handle gene positions that are negative or zero
+                Z = genomeLength + Z + 1
             if Z in inFileDictP and col0 in geneDictP:
                 geneDictP[col0] += inFileDictP[Z]
             elif Z in inFileDictP:
@@ -135,6 +144,9 @@ def expression(inputFileP, inputFileM, inputListP, inputListM, outputFileP, outp
   # Sum up and write read densities per protein coding region in dictionary
 
         for Z in range(col1, col2 + 1):
+            if Z < 0:
+                # Handle gene positions that are negative or zero
+                Z = genomeLength + Z + 1
             if Z in inFileDictM and col0 in geneDictM:
                 geneDictM[col0] += inFileDictM[Z]
             elif Z in inFileDictM:
@@ -172,6 +184,7 @@ if __name__ == '__main__':
     parser.add_argument('--listM', help='Input list M.')
     parser.add_argument('--outP', help='Output file P.')
     parser.add_argument('--outM', help='Output file M.')
+    parser.add_argument('--gLen', help='Length of genome.')
 
     args = parser.parse_args()
 
@@ -181,5 +194,6 @@ if __name__ == '__main__':
     inputListM = args.listM
     outputFileP = args.outP
     outputFileM = args.outM
+    genomeLength = int(args.gLen)
 
-    expression(inputFileP, inputFileM, inputListP, inputListM, outputFileP, outputFileM)
+    expression(inputFileP, inputFileM, inputListP, inputListM, outputFileP, outputFileM, genomeLength)

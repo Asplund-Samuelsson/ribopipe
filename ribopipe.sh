@@ -172,7 +172,7 @@ if [[ START_STEP -le S ]]
     # Report step done
     echo -e "\n\e[92mStep $S: Done.\e[0m\n"
 
-    
+
     if [[ HALT_S5 -eq 1 ]]
 	  then
 	    # Halt script
@@ -512,12 +512,13 @@ if [[ START_STEP -le S ]]
       out_m="${prefix}.readsPerGene.m"
       # Run the reads per gene script with the supplied options
       $readsPerGeneScript --inP $infile_p --inM $infile_m \
-      --listP $genelistP --listM $genelistM --outP $out_p --outM $out_m
+      --listP $genelistP --listM $genelistM --outP $out_p --outM $out_m \
+      --gLen $genomeLength
     }
 
     # Export function and variables so that each subprocess can access them
     export -f run_genes
-    export readsPerGeneScript genelistP genelistM
+    export readsPerGeneScript genelistP genelistM genomeLength
     export EXPERIMENT_NAME
 
     # Run reads per gene counting in parallel for the input files
