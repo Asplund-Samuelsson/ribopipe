@@ -465,7 +465,8 @@ if [[ START_STEP -le S ]]
       out_m="${prefix}.readsPerGene.m"
       # Run the reads per gene script with the supplied options
       $readsPerGeneScript --inP $infile_p --inM $infile_m \
-      --listP $genelistP --listM $genelistM --outP $out_p --outM $out_m
+      --listP $genelistP --listM $genelistM --outP $out_p --outM $out_m \
+      --gLen $genomeLength
     }
 
     # Export function and variables so that each subprocess can access them
