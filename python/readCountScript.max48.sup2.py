@@ -29,10 +29,10 @@ def rawdata(inputFile, outputFileP, outputFileM, min_length, max_length):
     inFile = open(inputFile, 'r')
     line = inFile.readline()
     while line != '':
-        fields = line.split()
-        col2 = str(fields[2])   #strand; note: if sequencing was performed without barcode reading, the column numbering is changed
-        col4 = int(fields[4])   #left-most position
-        col5 = str(fields[5])   #footprint seq
+        fields = line.split("\t")
+        col2 = str(fields[1])   #strand; note: if sequencing was performed without barcode reading, the column numbering is changed
+        col4 = int(fields[3])   #left-most position
+        col5 = str(fields[4])   #read seq
         length = len(col5)      #footprint length
 
         center_offset = int((min_length-1)/2) #center for min_length always 1 or 2 nt
