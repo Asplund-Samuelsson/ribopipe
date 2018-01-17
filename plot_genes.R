@@ -123,7 +123,7 @@ if (tolower(plot_type) == "facets"){
   gdat_exp = expand.genes(gdat)
 
   # Merge with RPM data
-  grpm = merge(gdat_exp, rpm)
+  grpm = merge(gdat_exp, subset(rpm, Position %in% unique(gdat_exp$Position)))
 
   # Facilitate reversing order of positions in minus strand by multiplying with -1
   grpm$Position = ifelse(grpm$strand == "-", grpm$Position * -1, grpm$Position)
