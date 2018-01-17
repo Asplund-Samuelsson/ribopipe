@@ -52,26 +52,29 @@ gene_strands = ifelse(
 
 ### LOAD DATA ##################################################################
 
+# Use data.table library for faster loading
+library(data.table)
+
 # Load the files
-rpm_data = lapply(rpm_files, read.delim, header=F)
-gene_data = lapply(gene_files, read.delim, header=F)
+rpm_data = lapply(rpm_files, fread, header=F)
+gene_data = lapply(gene_files, fread, header=F)
 
 # Add columns with sample and strand IDs to each dataframe
 for( i in seq_along(rpm_data)){
-  rpm_data[[i]] = cbind(rpm_data[[i]], Sample=rpm_samples[i])
-  rpm_data[[i]] = cbind(rpm_data[[i]], strand=rpm_strands[i])
+  rpm_data[[i]] = cbind(as.data.frame(rpm_data[[i]]), Sample=rpm_samples[i])
+  rpm_data[[i]] = cbind(as.data.frame(rpm_data[[i]]), strand=rpm_strands[i])
 }
 for( i in seq_along(gene_data)){
-  gene_data[[i]] = cbind(gene_data[[i]], Sample=gene_samples[i])
-  gene_data[[i]] = cbind(gene_data[[i]], strand=gene_strands[i])
+  gene_data[[i]] = cbind(as.data.frame(gene_data[[i]]), Sample=gene_samples[i])
+  gene_data[[i]] = cbind(as.data.frame(gene_data[[i]]), strand=gene_strands[i])
 }
 
 # Create one dataframe for RPM data
-rpm = do.call("rbind", rpm_data)
+rpm = as.data.frame(rbindlist(rpm_data))
 colnames(rpm)[1:2] = c("Position", "RPM")
 
 # Create one dataframe for gene data
-gen = do.call("rbind", gene_data)
+gen = as.data.frame(rbindlist(gene_data))
 colnames(gen)[1:4] = c("Name", "Start", "End", "Reads")
 
 ### DEFINE FUNCTIONS ###########################################################
