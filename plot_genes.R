@@ -11,7 +11,7 @@ plot_type = args[3] # Plot "facets" or "operon"
 outfile = args[4] # Output plot in PDF format
 
 # TESTING
-#indir="/ssd/common/proj/RibosomeProfiling/tsspipe_testing/2017.09.05.CSD2"
+#indir="/ssd/common/proj/RibosomeProfiling/ribopipe_testing/CSD2_3prime"
 #genes="slr1510,slr1511,sll1418"
 #outfile="/tmp/ribopipe_plot.pdf"
 #plot_type="operon"
@@ -155,11 +155,11 @@ if (tolower(plot_type) == "facets"){
 if (tolower(plot_type) == "operon"){
 
   # Load libraries
-  library(ggbio)
-  library(GenomicRanges)
-  library(egg)
-  library(ggrepel)
-  library(plyr)
+  suppressMessages(library(ggbio))
+  suppressMessages(library(GenomicRanges))
+  suppressMessages(library(egg))
+  suppressMessages(library(ggrepel))
+  suppressMessages(library(plyr))
 
   # Clean up when testing
   if(exists("gr")){rm("gr")}
@@ -234,15 +234,20 @@ if (tolower(plot_type) == "operon"){
   # Perform plotting
 
   # Define breaks
+  x_major_breaks_magnitude = 10^round_any(
+    log10(genes_full_range[2] - genes_full_range[1] + 1), 1, f=floor
+    )
+  x_minor_breaks_magnitude = x_major_breaks_magnitude / 10
+
   x_major_breaks = seq(
-    round_any(genes_full_range[1],1000, f=ceiling),
-    round_any(genes_full_range[2],1000, f=floor),
-    1000
+    round_any(genes_full_range[1], x_major_breaks_magnitude, f=ceiling),
+    round_any(genes_full_range[2], x_major_breaks_magnitude, f=floor),
+    x_major_breaks_magnitude
     )
   x_minor_breaks = seq(
-    round_any(genes_full_range[1],100, f=ceiling),
-    round_any(genes_full_range[2],100, f=floor),
-    100
+    round_any(genes_full_range[1], x_minor_breaks_magnitude, f=ceiling),
+    round_any(genes_full_range[2], x_minor_breaks_magnitude, f=floor),
+    x_minor_breaks_magnitude
     )
 
   # Plot RPM
