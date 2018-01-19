@@ -46,7 +46,7 @@ bowtie_8_p="10"
 bowtie_8_ref="/ssd/common/tools/bowtie1-1.1.2/indexes/syn6803.NC_000911"
 
 # Step 9: Count the number of reads on read-occupied positions in genome (PARALLEL)
-readCountScript="/ssd/common/tools/ribopipe/python/readCountScript.max48.sup2.py"
+readCountScript="/ssd/common/tools/ribopipe/python/readCountScript.max48.sup2.3prime_mod.py"
 min_length="23"
 max_length="48"
 
