@@ -252,8 +252,8 @@ if [[ START_STEP -le S ]]
         out_sam=$(echo $out_fastq | sed -e 's/deplete\.fastq/.sam/')
         out_report=$(echo $out_fastq | sed -e 's/\.fastq/.report.txt/')
         # Run bowtie1
-        bowtie -a --best --strata -t -n $bowtie_7_n -l $bowtie_7_l -S \
-        -p $bowtie_7_p --un $out_fastq $bowtie_7_ref $infile $out_sam \
+        bowtie -a --best --strata -t -n $bowtie_7_n -l $bowtie_7_l \
+        -p $bowtie_7_p --un $out_fastq $bowtie_7_ref $infile /dev/null \
         2> $out_report
       done
 

@@ -4,8 +4,8 @@
 EXPERIMENT_NAME="CCE11"
 OUTDIR="2017.12.15.${EXPERIMENT_NAME}"
 THREADS="16"
-START_STEP=1 # Auto-stop after step 5 unless skipped. Continue from step 6.
-HALT_S5=1
+START_STEP=7 # Auto-stop after step 5 unless skipped. Continue from step 6.
+HALT_S5=7
 # Step-specific options
 
 # Step 1: Import data to working directory
@@ -47,8 +47,8 @@ bowtie_8_ref="/ssd/common/tools/bowtie1-1.1.2/indexes/syn6803.NC_000911"
 
 # Step 9: Count the number of reads on read-occupied positions in genome (PARALLEL)
 readCountScript="/ssd/common/tools/ribopipe/python/readCountScript.max48.sup2.3prime_mod.py"
-min_length="23"
-max_length="48"
+min_length="15"
+max_length="52"
 
 # Step 10: Calculate total number of mapped reads
 totalNbrMappedReadsScript="/ssd/common/tools/ribopipe/python/totalNbrMappedReadsScript.sup3.py"
