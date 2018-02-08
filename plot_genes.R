@@ -8,13 +8,15 @@ args = commandArgs(trailingOnly=T)
 indir = args[1] # A ribopipe results directory
 genes = args[2] # Gene name(s); slr1834,sll1234, or interval; 8001:9001
 plot_type = args[3] # Plot "facets" or "operon"
-outfile = args[4] # Output plot in PDF format
+shift = as.numeric(args[4]) # Signal shift to apply to nucleotide RPM values
+outfile = args[5] # Output plot in PDF format
 
 # TESTING
 #indir="/ssd/common/proj/RibosomeProfiling/ribopipe_testing/CSD2_3prime"
 #genes="slr1510,slr1511,sll1418"
-#outfile="/tmp/ribopipe_plot.pdf"
 #plot_type="operon"
+#shift=-12
+#outfile="/tmp/ribopipe_plot.pdf"
 
 ### FILENAMES, SAMPLE IDS AND STRAND IDS #######################################
 
@@ -76,6 +78,37 @@ colnames(rpm)[1:2] = c("Position", "RPM")
 # Create one dataframe for gene data
 gen = as.data.frame(rbindlist(gene_data))
 colnames(gen)[1:4] = c("Name", "Start", "End", "Reads")
+
+### SHIFT RPM VALUES ###########################################################
+
+if (shift) {
+
+  # For the plus strand, the position shift is added
+  # For the minus strand, the position shift is subtracted
+
+  # Change position by the shift
+  rpm_shift = rpm
+  rpm_shift$Position = ifelse(
+    rpm_shift$strand == "+",
+    rpm_shift$Position + shift,
+    rpm_shift$Position - shift
+    )
+
+  # Fold around beginning of circular genome
+  genome_size = max(rpm$Position)
+  rpm_shift$Position = ifelse(
+    rpm_shift$Position < 1,
+    rpm_shift$Position + genome_size,
+    ifelse(
+      rpm_shift$Position > genome_size,
+      rpm_shift$Position - genome_size,
+      rpm_shift$Position
+      )
+    )
+
+  rpm = rpm_shift
+
+}
 
 ### DEFINE FUNCTIONS ###########################################################
 
