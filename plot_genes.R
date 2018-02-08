@@ -20,6 +20,8 @@ outfile = args[5] # Output plot in PDF format
 
 ### FILENAMES, SAMPLE IDS AND STRAND IDS #######################################
 
+message("Loading data...")
+
 # List RPM0 filenames
 rpm_files = list.files(
   path=paste(c(indir, "/RPM"), collapse=""), pattern="\\.RPM0\\.", full.names=T
@@ -55,7 +57,7 @@ gene_strands = ifelse(
 ### LOAD DATA ##################################################################
 
 # Use data.table library for faster loading
-library(data.table)
+suppressMessages(library(data.table))
 
 # Load the files
 rpm_data = lapply(rpm_files, fread, header=F)
@@ -82,6 +84,8 @@ colnames(gen)[1:4] = c("Name", "Start", "End", "Reads")
 ### SHIFT RPM VALUES ###########################################################
 
 if (shift) {
+
+  message("Shifting RPM values...")
 
   # For the plus strand, the position shift is added
   # For the minus strand, the position shift is subtracted
@@ -113,7 +117,7 @@ if (shift) {
 ### DEFINE FUNCTIONS ###########################################################
 
 # Load general libraries
-library(ggplot2)
+suppressMessages(library(ggplot2))
 
 # Expand gene data to every position
 expand.genes = function(gdat){
@@ -145,6 +149,8 @@ colScale <- scale_fill_manual(name = "strand", values = strandColors)
 ### PLOT DATA AS FACETS ########################################################
 
 if (tolower(plot_type) == "facets"){
+
+  message("Performing facets plotting...")
 
   # Plotting for individual genes
   gene_names = unlist(strsplit(genes, ","))
@@ -189,6 +195,8 @@ if (tolower(plot_type) == "facets"){
 ### PLOT GENOMIC RANGE (OPERON) ################################################
 
 if (tolower(plot_type) == "operon"){
+
+  message("Performing operon plotting...")
 
   # Load libraries
   suppressMessages(library(ggbio))
@@ -412,6 +420,8 @@ if (tolower(plot_type) == "operon"){
     gp_rpm_m = plot_RPM("-", reverse_facets=T)
     ggarrange(gp_rpm_p, gp_genes, gp_rpm_m, ncol=1, heights=c(20,2,20))
   }
-  dev.off()
+  garbage = dev.off()
 
 }
+
+message("Done.")
