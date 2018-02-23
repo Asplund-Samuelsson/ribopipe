@@ -318,7 +318,7 @@ if (tolower(plot_type) == "operon"){
       gene_bounds = c(gr_df$start, gr_df$end)
       for (position in gene_bounds){
         gp = gp + geom_vline(
-          xintercept=position, colour="black", size=0.2, alpha=0.8
+          xintercept=position, colour="black", size=0.2, alpha=0.4
           )
       }
     }
