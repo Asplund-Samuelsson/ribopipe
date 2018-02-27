@@ -210,12 +210,8 @@ if (tolower(plot_type) == "operon"){
 
   # Check if range or set of gene names
   if(grepl(":", genes, fixed=T)){
-    # Get genes from specified range
+    # Parse the specified range
     genes_full_range = as.numeric(unlist(strsplit(genes, ":")))
-    gdat = subset(gen, (Start >= genes_full_range[1] & Start <= genes_full_range[2]) | (End >= genes_full_range[1] & End <= genes_full_range[2]))
-    # Clip genes to range
-    gdat$Start[gdat$Start <= genes_full_range[1]] = genes_full_range[1]
-    gdat$End[gdat$End >= genes_full_range[2]] = genes_full_range[2]
   }else{
     # Get range from specified genes
     gene_names = unlist(strsplit(genes, ","))
@@ -225,6 +221,13 @@ if (tolower(plot_type) == "operon"){
       max(c(gdat$Start, gdat$End)) + 100
     )
   }
+
+  # Extract all gene data for the specified range
+  gdat = subset(gen, (Start >= genes_full_range[1] & Start <= genes_full_range[2]) | (End >= genes_full_range[1] & End <= genes_full_range[2]))
+
+  # Clip genes to range
+  gdat$Start[gdat$Start <= genes_full_range[1]] = genes_full_range[1]
+  gdat$End[gdat$End >= genes_full_range[2]] = genes_full_range[2]
 
   # Expand gene data and merge with whole range of RPM data
   if(nrow(gdat)){
