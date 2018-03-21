@@ -38,14 +38,14 @@ sickle_l="6"
 bowtie_7_n="2"
 bowtie_7_l="28"
 bowtie_7_p="10"
-bowtie_7_ref="/ssd/common/tools/bowtie1-1.1.2/indexes/rRNAtRNA.syn6803.NC000911"
+bowtie_7_ref="/ssd/common/tools/ribopipe/reference_sequences/syn_PCC6803/rRNAtRNA.syn6803.NC000911"
 
 # Step 8: Map reads to the genome
 bowtie_8_m="1"
 bowtie_8_n="2"
 bowtie_8_l="28"
 bowtie_8_p="10"
-bowtie_8_ref="/ssd/common/tools/bowtie1-1.1.2/indexes/syn6803.NC_000911"
+bowtie_8_ref="/ssd/common/tools/ribopipe/reference_sequences/syn_PCC6803/NC_000911.1_chr_7plasmids"
 
 # Step 9: Count the number of reads on read-occupied positions in genome (PARALLEL)
 readCountScript="/ssd/common/tools/ribopipe/python/readCountScript.max48.sup2.3prime_mod.py"
