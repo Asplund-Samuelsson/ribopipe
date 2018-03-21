@@ -465,7 +465,7 @@ if [[ START_STEP -le S ]]
       out_p="${prefix}.RPM0.p"
       out_m="${prefix}.RPM0.m"
       # Run the zero count completion script with the supplied options
-      $RPMcompleteScript --inP $infile_p --inM $infile_m \
+      $RPMcompleteScript --inP $infile_p --inM $infile_m --inG $GENOME_FASTA \
       --outP $out_p --outM $out_m
     }
 
@@ -473,6 +473,7 @@ if [[ START_STEP -le S ]]
     export -f run_complete
     export RPMcompleteScript
     export EXPERIMENT_NAME
+    export GENOME_FASTA
 
     # Run zero count completion in parallel for the input files
     parallel --no-notice --jobs $THREADS run_complete ::: ${input_files_12[@]}
@@ -495,7 +496,7 @@ if [[ START_STEP -le S ]]
     # Report progress
     echo -e "\n\e[94mStep $S: Counting the number of reads on every gene...\e[0m\n"
 
-    # Store input filenames in array (specific for step 12; files from step 11)
+    # Store input filenames in array (specific for step 13; files from step 9)
     input_files_13=(readcount/${EXPERIMENT_NAME}.*.readCount.p)
 
     # Define run_genes function to be used with GNU parallel application
@@ -513,12 +514,12 @@ if [[ START_STEP -le S ]]
       # Run the reads per gene script with the supplied options
       $readsPerGeneScript --inP $infile_p --inM $infile_m \
       --listP $genelistP --listM $genelistM --outP $out_p --outM $out_m \
-      --gLen $genomeLength
+      --inG $GENOME_FASTA
     }
 
     # Export function and variables so that each subprocess can access them
     export -f run_genes
-    export readsPerGeneScript genelistP genelistM genomeLength
+    export readsPerGeneScript genelistP genelistM GENOME_FASTA
     export EXPERIMENT_NAME
 
     # Run reads per gene counting in parallel for the input files

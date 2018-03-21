@@ -6,6 +6,8 @@ OUTDIR="YYYY.MM.DD.${EXPERIMENT_NAME}"
 THREADS="16"
 START_STEP=1 # Auto-stop after step 5 unless skipped. Continue from step 6.
 HALT_S5=1
+GENOME_FASTA="/ssd/common/tools/ribopipe/reference_sequences/syn_PCC6803/NC_000911.1_chr_7plasmids.fasta"
+
 # Step-specific options
 
 # Step 1: Import data to working directory
@@ -57,10 +59,9 @@ totalNbrMappedReadsScript="/ssd/common/tools/ribopipe/python/totalNbrMappedReads
 RPMscript="/ssd/common/tools/ribopipe/python/RPMscript.sup6.py"
 
 # Step 12: Complete RPM list by assigning “0” to all unoccupied positions
-RPMcompleteScript="/ssd/common/tools/ribopipe/python/RPMcompleteScript.NC000911.sup7.py"
+RPMcompleteScript="/ssd/common/tools/ribopipe/python/RPMcompleteScript.sup7.edited.py"
 
 # Step 13: Count the number of reads on every gene
 readsPerGeneScript="/ssd/common/tools/ribopipe/python/readsPerGeneScript.sup4.edited.py"
-genelistP="/ssd/common/tools/ribopipe/genelists/syn6803.NC_000911.1.genelist_p"
-genelistM="/ssd/common/tools/ribopipe/genelists/syn6803.NC_000911.1.genelist_m"
-genomeLength="3573470"
+genelistP="/ssd/common/tools/ribopipe/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist.m"
+genelistM="/ssd/common/tools/ribopipe/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist.p"

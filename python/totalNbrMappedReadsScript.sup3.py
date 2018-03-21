@@ -5,15 +5,19 @@ Supplementary Note 3: Total reads
 
 Author: Annemarie Becker
 
+Modified by: Johannes Asplund-Samuelsson (KTH)
+
 inputFileP:
 read density file for plus strand (Supplementary Note 2)
-    col0: position along genome
-    col1: read density at that position
+    col0/NA: reference sequence
+    col1/0: position along genome
+    col2/1: read density at that position
 
 inputFileM:
 read density file for minus strand (Supplementary Note 2)
-    col0: position along genome
-    col1: read density at that position
+    col0/NA: reference sequence
+    col1/0: position along genome
+    col2/1: read density at that position
 
 outputFile:
 total read number as float
@@ -31,9 +35,8 @@ def countReads(inputFileP,inputFileM, outputFile):
     i = 0
     while line != '':
         fields = line.split()
-        col0 = int(fields[0])
-        col1 = float(fields[1])
-        i = i+col1		#count reads on plus strand
+        rc = float(fields[-1])
+        i = i + rc # count reads on plus strand
         line = inFileP.readline()
     totReadsP = i
 
@@ -41,9 +44,8 @@ def countReads(inputFileP,inputFileM, outputFile):
     j = 0
     while line != '':
         fields = line.split()
-        col0 = int(fields[0])
-        col1 = float(fields[1])
-        j = j+col1		#count reads on minus strand
+        rc = float(fields[-1])
+        j = j + rc # count reads on minus strand
         line = inFileM.readline()
     totReadsM = j
 

@@ -5,28 +5,34 @@ Supplementary Note 6: RPM-normalized read densities
 
 Author: Annemarie Becker
 
+Modified by: Johannes Asplund-Samuelsson (KTH)
+
 inputFileP:
 read density file for plus strand (Supplementary Note 2)
-    col0: position along genome
-    col1: read density at that position
+    col0/NA: reference sequence
+    col1/0: position along genome
+    col2/1: read density at that position
 
 inputFileM:
 read density file for minus strand (Supplementary Note 2)
-    col0: position along genome
-    col1: read density at that position
+    col0/NA: reference sequence
+    col1/0: position along genome
+    col2/1: read density at that position
 
 inputNumber:
 total read number as float (Supplementary Note 3)
 
 outputFileP:
 RPM-normalized read density file for plus strand
-    col0: position along genome
-    col1: RPM-normalized read density at that position
+    col0/NA: reference sequence
+    col1/0: position along genome
+    col2/1: RPM-normalized read density at that position
 
 outputFileM:
 RPM-normalized read density file for minus strand
-    col0: position along genome
-    col1: RPM-normalized read density at that position
+    col0/NA: reference sequence
+    col1/0: position along genome
+    col2/1: RPM-normalized read density at that position
 
 """
 
@@ -46,10 +52,9 @@ def norm(inputFileP, inputFileM, inputNumber, outputFileP, outputFileM):
     i = 0
     while line != '':
         fields = line.split()
-        col0 = int(fields[0])
-        col1 = float(fields[1])
-        RPM = col1 / totalReads * 1000000
-        outFile.write(str(col0) + '\t' + str(RPM) + '\n')
+        rc = float(fields[-1])
+        RPM = rc / totalReads * 1000000
+        outFile.write('\t'.join(fields[0:-1]) + '\t' + str(RPM) + '\n')
         line = inFile.readline()
 
 
@@ -66,10 +71,9 @@ def norm(inputFileP, inputFileM, inputNumber, outputFileP, outputFileM):
     i = 0
     while line != '':
         fields = line.split()
-        col0 = int(fields[0])
-        col1 = float(fields[1])
-        RPM = col1 / totalReads * 1000000
-        outFile.write(str(col0) + '\t' + str(RPM) + '\n')
+        rc = float(fields[-1])
+        RPM = rc / totalReads * 1000000
+        outFile.write('\t'.join(fields[0:-1]) + '\t' + str(RPM) + '\n')
         line = inFile.readline()
 
 

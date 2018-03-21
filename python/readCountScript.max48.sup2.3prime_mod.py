@@ -33,6 +33,7 @@ def rawdata(inputFile, outputFileP, outputFileM, min_length, max_length):
     while line != '':
         fields = line.split("\t")
         col2 = str(fields[1])   #strand; note: if sequencing was performed without barcode reading, the column numbering is changed
+        col3 = str(fields[2])   #seq-id
         col4 = int(fields[3])   #left-most position
         col5 = str(fields[4])   #read seq
         length = len(col5)      #read length
@@ -44,33 +45,43 @@ def rawdata(inputFile, outputFileP, outputFileM, min_length, max_length):
                 end5 = col4 + 1 #Bowtie uses zero-based offset, transform to 1-based
                 end3 = end5 + length - 1
                 # Assign the 3 prime end of the read to the genome position
-                if end3 in pDict:
-                    pDict[end3] += 1.0
+                if col3 not in pDict:
+                    pDict[col3] = {}
+                if end3 in pDict[col3]:
+                    pDict[col3][end3] += 1.0
                 else:
-                    pDict[end3] = 1.0
+                    pDict[col3][end3] = 1.0
 
             elif col2 == '-': #for minus strand
                 end3 = col4 + 1 #for minus strand, Bowtie gives leftmost position (3' end) with zero-based numbering
                 end5 = end3 + length - 1
                 # Assign the 3 prime end of the read to the genome position
+                if col3 not in mDict:
+                    mDict[col3] = {}
                 if end3 in mDict:
-                    mDict[end3] += 1.0
+                    mDict[col3][end3] += 1.0
                 else:
-                    mDict[end3] = 1.0
+                    mDict[col3][end3] = 1.0
 
         line = inFile.readline()
 
-    pList = pDict.items()
-    pList.sort()
     outFileP = open(outputFileP, 'w')
-    for J in pList:
-        outFileP.write(str(J[0]) + '\t' + str(J[1]) + '\n')
+    for ref_sequence in pDict:
+        pList = pDict[ref_sequence].items()
+        pList.sort()
+        for J in pList:
+            output = '\t'.join([ref_sequence, str(J[0]), str(J[1])]) + '\n'
+            outFileP.write(output)
+    outFileP.close()
 
-    mList = mDict.items()
-    mList.sort()
     outFileM = open(outputFileM, 'w')
-    for J in mList:
-        outFileM.write(str(J[0]) + '\t' + str(J[1]) + '\n')
+    for ref_sequence in mDict:
+        mList = mDict[ref_sequence].items()
+        mList.sort()
+        for J in mList:
+            output = '\t'.join([ref_sequence, str(J[0]), str(J[1])]) + '\n'
+            outFileM.write(output)
+    outFileM.close()
 
 
 if __name__=='__main__':

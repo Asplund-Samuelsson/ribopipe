@@ -1,11 +1,13 @@
 #!/usr/bin/python2.7
 
+from Bio import SeqIO
+
 """
 Supplementary Note 4: Read density per gene
 
 Authors: Eugene Oh
 
-Edited by Johannes Asplund-Samuelsson, KTH
+Modified by: Johannes Asplund-Samuelsson (KTH)
 
 inputFileP:
 read density file for plus strand (Supplementary Note 2)
@@ -50,126 +52,106 @@ length of genome sequence for negative gene position handling
 """
 
 
-def expression(inputFileP, inputFileM, inputListP, inputListM, outputFileP, outputFileM, genomeLength):
+def expression(inputFileP, inputFileM, inputListP, inputListM, outputFileP, \
+outputFileM, inputFileG):
+
+    # Initialize readcount dictionaries
+    DictP = {}
+    DictM = {}
+
+    # Load reference sequence lengths
+    ref_lengths = {}
+
+    FastaFile = open(inputFileG, 'rU')
+
+    for rec in SeqIO.parse(FastaFile, 'fasta'):
+        # Store length of reference sequence
+        ref_lengths[rec.id] = len(rec)
+        # Initialize reference sequence entries in readcount dictionaries
+        DictP[rec.id] = {}
+        DictM[rec.id] = {}
+
+    FastaFile.close()
 
 ### PLUS STRAND ###
 
   # Upload read density file from plus strand as a dictionary
-
-    inFileDictP = {}         #create dictionary that looks like input file
-
-    inFile = open(inputFileP, 'r')
-    line = inFile.readline()
-    while line != '':
-        fields = line.split()
-        col0 = int(fields[0])
-        col1 = float(fields[1])
-        inFileDictP[col0] = col1
+    def load_input(infile, Dict):
+        inFile = open(infile, 'r')
         line = inFile.readline()
+        while line != '':
+            fields = line.split()
+            try:
+                col0 = str(fields[-3])
+            except IndexError:
+                # If no reference, assume fasta has one reference
+                col0 = list(Dict.keys())[0]
+            col1 = int(fields[-2])
+            col2 = float(fields[-1])
+            Dict[col0][col1] = col2
+            line = inFile.readline()
+
+    load_input(inputFileP, DictP)
 
   # Upload plus strand gene list as a dictionary and list
 
-    geneDictP = {}         #create dictionary with col0=gene name; col1=read number
-    geneListP = []         #create list that looks like input gene list
+    def assign_gene_reads(inputList, Dict, outputFile):
 
-    inFile = open(inputListP, 'r')
-    line = inFile.readline()
-    while line != '':
-        fields = line.split()
-        geneListP.append(fields)        #add an item to the end of the list
-        col0 = str(fields[0])           #plus strand gene list: gene name
-        col1 = int(fields[1])           #plus strand gene list: start
-        col2 = int(fields[2])           #plus strand gene list: stop
+        geneDict = {} # create dictionary with col0=gene name; col1=read number
+        geneList = [] # create list that looks like input gene list
 
-  # Sum up and write read densities per protein coding region in dictionary
-
-        for Z in range(col1, col2 + 1):
-            if Z < 0:
-                # Handle gene positions that are negative or zero
-                Z = genomeLength + Z + 1
-            if Z in inFileDictP and col0 in geneDictP:
-                geneDictP[col0] += inFileDictP[Z]
-            elif Z in inFileDictP:
-                geneDictP[col0] = inFileDictP[Z]
+        inFile = open(inputList, 'r')
         line = inFile.readline()
+        while line != '':
+            fields = line.split()
+            geneList.append(fields)        # add an item to the end of the list
+            ref = str(fields[0])            # reference sequence ID
+            gene = str(fields[1])           # gene name
+            start = int(fields[2])          # start
+            stop = int(fields[3])           # stop
 
-  # Assign gene expression levels to all genes
+      # Sum up and write read densities per protein coding region in dictionary
 
-    tupledlistP = geneDictP.items()
-    for J in geneListP:
-        match = 0
-        for K in tupledlistP:
-            if J[0] == K[0]:
-                match = 1
-                J.append(K[1])
-        if match == 0:		#list genes that don't have any reads
-            J.append(0)
+            for Z in range(start, stop + 1):
+                if Z < 0:
+                    # Handle gene positions that are negative or zero
+                    Z = ref_lengths[ref] + Z + 1
+                if Z in Dict[ref] and gene in geneDict:
+                    geneDict[gene] += Dict[ref][Z]
+                elif Z in Dict[ref]:
+                    geneDict[gene] = Dict[ref][Z]
+            line = inFile.readline()
 
-  # Output file for plus strand
+      # Assign gene expression levels to all genes
 
-    outFile = open(outputFileP, 'w')
-    for J in geneListP:
-        outFile.write(str(J[0]) + '\t' + str(J[1]) + '\t' + str(J[2]) + '\t' + str(J[3]) + '\n')
+        tupledlist = geneDict.items()
+        for J in geneList:
+            match = 0
+            for K in tupledlist:
+                if J[1] == K[0]:
+                    match = 1
+                    J.append(K[1])
+            if match == 0:		#list genes that don't have any reads
+                J.append(0)
 
+      # Output file for plus strand
+
+        outFile = open(outputFile, 'w')
+        for J in geneList:
+            output = '\t'.join([str(x) for x in J]) + '\n'
+            outFile.write(output)
+
+    assign_gene_reads(inputListP, DictP, outputFileP)
 
 ### MINUS STRAND ###
 
   # Upload read density file from minus strand as a dictionary
 
-    inFileDictM = {}
-
-    inFile = open(inputFileM, 'r')
-    line = inFile.readline()
-    while line != '':
-        fields = line.split()
-        col0 = int(fields[0])
-        col1 = float(fields[1])
-        inFileDictM[col0] = col1
-        line = inFile.readline()
+    load_input(inputFileM, DictM)
 
   # Upload minus strand gene list as a dictionary and list
 
-    geneDictM = {}	#create dictionary with col0=gene name; col1=read number
-    geneListM = []	#create list that looks like input gene list
-
-    inFile = open(inputListM, 'r')
-    line = inFile.readline()
-    while line != '':
-        fields = line.split()
-        geneListM.append(fields)	#add an item to the end of the list
-        col0 = str(fields[0])           #minus strand gene list: gene name
-        col1 = int(fields[1])           #minus strand gene list: start
-        col2 = int(fields[2])           #minus strand gene list: stop
-
-  # Sum up and write read densities per protein coding region in dictionary
-
-        for Z in range(col1, col2 + 1):
-            if Z < 0:
-                # Handle gene positions that are negative or zero
-                Z = genomeLength + Z + 1
-            if Z in inFileDictM and col0 in geneDictM:
-                geneDictM[col0] += inFileDictM[Z]
-            elif Z in inFileDictM:
-                geneDictM[col0] = inFileDictM[Z]
-        line = inFile.readline()
-
-  # Assign gene expression levels to all genes
-
-    tupledlistM = geneDictM.items()
-    for J in geneListM:
-        match = 0
-        for K in tupledlistM:
-            if J[0] == K[0]:
-                match = 1
-                J.append(K[1])
-        if match == 0:
-            J.append(0)
-
-  # Output file for minus strand
-
-    outFile = open(outputFileM, 'w')
-    for J in geneListM:
-        outFile.write(str(J[0]) + '\t' + str(J[1]) + '\t' + str(J[2]) + '\t' + str(J[3]) + '\n')
+    assign_gene_reads(inputListM, DictM, outputFileM)
 
 
 if __name__ == '__main__':
@@ -184,7 +166,7 @@ if __name__ == '__main__':
     parser.add_argument('--listM', help='Input list M.')
     parser.add_argument('--outP', help='Output file P.')
     parser.add_argument('--outM', help='Output file M.')
-    parser.add_argument('--gLen', help='Length of genome.')
+    parser.add_argument('--inG', help='Genome fasta.')
 
     args = parser.parse_args()
 
@@ -194,6 +176,6 @@ if __name__ == '__main__':
     inputListM = args.listM
     outputFileP = args.outP
     outputFileM = args.outM
-    genomeLength = int(args.gLen)
+    inputFileG = args.inG
 
-    expression(inputFileP, inputFileM, inputListP, inputListM, outputFileP, outputFileM, genomeLength)
+    expression(inputFileP, inputFileM, inputListP, inputListM, outputFileP, outputFileM, inputFileG)
