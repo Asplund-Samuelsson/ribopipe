@@ -63,5 +63,5 @@ RPMcompleteScript="/ssd/common/tools/ribopipe/python/RPMcompleteScript.sup7.edit
 
 # Step 13: Count the number of reads on every gene
 readsPerGeneScript="/ssd/common/tools/ribopipe/python/readsPerGeneScript.sup4.edited.py"
-genelistP="/ssd/common/tools/ribopipe/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist.m"
-genelistM="/ssd/common/tools/ribopipe/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist.p"
+genelistP="/ssd/common/tools/ribopipe/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist.p"
+genelistM="/ssd/common/tools/ribopipe/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist.m"
