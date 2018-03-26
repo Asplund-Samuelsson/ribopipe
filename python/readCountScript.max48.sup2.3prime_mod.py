@@ -47,9 +47,9 @@ def rawdata(inputFile, outputFileP, outputFileM, min_length, max_length):
                 # Assign the 3 prime end of the read to the genome position
                 if col3 not in pDict:
                     pDict[col3] = {}
-                if end3 in pDict[col3]:
+                try:
                     pDict[col3][end3] += 1.0
-                else:
+                except KeyError:
                     pDict[col3][end3] = 1.0
 
             elif col2 == '-': #for minus strand
@@ -58,30 +58,25 @@ def rawdata(inputFile, outputFileP, outputFileM, min_length, max_length):
                 # Assign the 3 prime end of the read to the genome position
                 if col3 not in mDict:
                     mDict[col3] = {}
-                if end3 in mDict:
+                try:
                     mDict[col3][end3] += 1.0
-                else:
+                except KeyError:
                     mDict[col3][end3] = 1.0
 
         line = inFile.readline()
 
-    outFileP = open(outputFileP, 'w')
-    for ref_sequence in pDict:
-        pList = pDict[ref_sequence].items()
-        pList.sort()
-        for J in pList:
-            output = '\t'.join([ref_sequence, str(J[0]), str(J[1])]) + '\n'
-            outFileP.write(output)
-    outFileP.close()
+    def write_readcount(outputFile, Dict):
+        outFile = open(outputFile, 'w')
+        for ref_sequence in Dict:
+            List = Dict[ref_sequence].items()
+            List.sort()
+            for J in List:
+                output = '\t'.join([ref_sequence, str(J[0]), str(J[1])]) + '\n'
+                outFile.write(output)
+        outFile.close()
 
-    outFileM = open(outputFileM, 'w')
-    for ref_sequence in mDict:
-        mList = mDict[ref_sequence].items()
-        mList.sort()
-        for J in mList:
-            output = '\t'.join([ref_sequence, str(J[0]), str(J[1])]) + '\n'
-            outFileM.write(output)
-    outFileM.close()
+    write_readcount(outputFileP, pDict)
+    write_readcount(outputFileM, mDict)
 
 
 if __name__=='__main__':

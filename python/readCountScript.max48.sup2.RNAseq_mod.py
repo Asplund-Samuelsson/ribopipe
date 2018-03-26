@@ -46,9 +46,9 @@ def rawdata(inputFile, outputFileP, outputFileM):
                 pDict[col3] = {}
 
             for elem in range(end5, end3 + 1):
-                if elem in pDict[col3]:
+                try:
                     pDict[col3][elem] += (1.0 / length)
-                else:
+                except KeyError:
                     pDict[col3][elem] = (1.0 / length)
 
         elif col2 == '-': #for minus strand
@@ -59,30 +59,25 @@ def rawdata(inputFile, outputFileP, outputFileM):
                 mDict[col3] = {}
 
             for elem in range(end3, end5 + 1):
-                if elem in mDict[col3]:
+                try:
                     mDict[col3][elem] += (1.0 / length)
-                else:
+                except KeyError:
                     mDict[col3][elem] = (1.0 / length)
 
         line = inFile.readline()
 
-    outFileP = open(outputFileP, 'w')
-    for ref_sequence in pDict:
-        pList = pDict[ref_sequence].items()
-        pList.sort()
-        for J in pList:
-            output = '\t'.join([ref_sequence, str(J[0]), str(J[1])]) + '\n'
-            outFileP.write(output)
-    outFileP.close()
+    def write_readcount(outputFile, Dict):
+        outFile = open(outputFile, 'w')
+        for ref_sequence in Dict:
+            List = Dict[ref_sequence].items()
+            List.sort()
+            for J in List:
+                output = '\t'.join([ref_sequence, str(J[0]), str(J[1])]) + '\n'
+                outFile.write(output)
+        outFile.close()
 
-    outFileM = open(outputFileM, 'w')
-    for ref_sequence in mDict:
-        mList = mDict[ref_sequence].items()
-        mList.sort()
-        for J in mList:
-            output = '\t'.join([ref_sequence, str(J[0]), str(J[1])]) + '\n'
-            outFileM.write(output)
-    outFileM.close()
+    write_readcount(outputFileP, pDict)
+    write_readcount(outputFileM, mDict)
 
 
 if __name__=='__main__':
