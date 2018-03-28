@@ -6,17 +6,28 @@
 # Load command line arguments
 args = commandArgs(trailingOnly=T)
 indir = args[1] # A ribopipe results directory
-genes = args[2] # Gene name(s); slr1834,sll1234, or interval; 8001:9001
+genes = args[2] # Gene name(s); slr1834,sll1234, or interval; ref_seq:8001:9001
 plot_type = args[3] # Plot "facets" or "operon"
 shift = as.numeric(args[4]) # Signal shift to apply to nucleotide RPM values
 outfile = args[5] # Output plot in PDF format
 
 # TESTING
-#indir="/ssd/common/proj/RibosomeProfiling/ribopipe_testing/CSD2_3prime"
-#genes="slr1510,slr1511,sll1418"
-#plot_type="operon"
-#shift=-12
-#outfile="/tmp/ribopipe_plot.pdf"
+# indir="/hdd/common/proj/RibosomeProfiling/results/2018-03-26/CSD2_plasmid_test_2"
+#
+# genes="sll6098,slr1510,slr1511,sll1418"
+# plot_type="facets"
+# shift=-12
+# outfile="/tmp/ribopipe_facets_plot.pdf"
+#
+# genes="slr1510,slr1511,sll1418"
+# plot_type="operon"
+# shift=-12
+# outfile="/tmp/ribopipe_operon_plot.chromosome.pdf"
+#
+# genes="NC_005230.1:82000:87000"
+# plot_type="operon"
+# shift=-12
+# outfile="/tmp/ribopipe_operon_plot.plasmid.pdf"
 
 ### FILENAMES, SAMPLE IDS AND STRAND IDS #######################################
 
@@ -75,13 +86,15 @@ for( i in seq_along(gene_data)){
 
 # Create one dataframe for RPM data
 rpm = as.data.frame(rbindlist(rpm_data))
-colnames(rpm)[1:2] = c("Position", "RPM")
+colnames(rpm)[1:3] = c("Sequence", "Position", "RPM")
 
 # Create one dataframe for gene data
 gen = as.data.frame(rbindlist(gene_data))
-colnames(gen)[1:4] = c("Name", "Start", "End", "Reads")
+colnames(gen)[1:5] = c("Sequence", "Name", "Start", "End", "Reads")
 
 ### SHIFT RPM VALUES ###########################################################
+
+library(dplyr)
 
 if (shift) {
 
@@ -99,18 +112,22 @@ if (shift) {
     )
 
   # Fold around beginning of circular genome
-  genome_size = max(rpm$Position)
+  sequence_sizes = aggregate(Position ~ Sequence, rpm, max)
+  colnames(sequence_sizes)[2] = "Size"
+
+  rpm_shift = inner_join(rpm_shift, sequence_sizes)
+
   rpm_shift$Position = ifelse(
     rpm_shift$Position < 1,
-    rpm_shift$Position + genome_size,
+    rpm_shift$Position + rpm_shift$Size,
     ifelse(
-      rpm_shift$Position > genome_size,
-      rpm_shift$Position - genome_size,
+      rpm_shift$Position > rpm_shift$Size,
+      rpm_shift$Position - rpm_shift$Size,
       rpm_shift$Position
       )
     )
 
-  rpm = rpm_shift
+  rpm = rpm_shift[,c("Sequence","Position","RPM","Sample","strand")]
 
 }
 
@@ -122,6 +139,7 @@ suppressMessages(library(ggplot2))
 # Expand gene data to every position
 expand.genes = function(gdat){
   gdat_exp = data.frame(
+    Sequence=character(),
     Name=character(),
     Position=numeric(),
     Sample=character(),
@@ -130,6 +148,7 @@ expand.genes = function(gdat){
 
   for( i in seq(1:(nrow(gdat)))){
     gdat_new = data.frame(
+      Sequence=gdat[i,]$Sequence,
       Name=gdat[i,]$Name,
       Position=seq(gdat[i,]$Start, gdat[i,]$End),
       Sample=gdat[i,]$Sample,
@@ -162,7 +181,7 @@ if (tolower(plot_type) == "facets"){
   gdat_exp = expand.genes(gdat)
 
   # Merge with RPM data
-  grpm = merge(gdat_exp, subset(rpm, Position %in% unique(gdat_exp$Position)))
+  grpm = inner_join(gdat_exp, subset(rpm, Position %in% unique(gdat_exp$Position)))
 
   # Facilitate reversing order of positions in minus strand by multiplying with -1
   grpm$Position = ifelse(grpm$strand == "-", grpm$Position * -1, grpm$Position)
@@ -211,7 +230,11 @@ if (tolower(plot_type) == "operon"){
   # Check if range or set of gene names
   if(grepl(":", genes, fixed=T)){
     # Parse the specified range
-    genes_full_range = as.numeric(unlist(strsplit(genes, ":")))
+    genes_list = unlist(strsplit(genes, ":"))
+    sequence = genes_list[1]
+    operon_start = as.numeric(genes_list[2])
+    operon_end = as.numeric(genes_list[3])
+    genes_full_range = c(operon_start, operon_end)
   }else{
     # Get range from specified genes
     gene_names = unlist(strsplit(genes, ","))
@@ -220,10 +243,18 @@ if (tolower(plot_type) == "operon"){
       min(c(gdat$Start, gdat$End)) - 100,
       max(c(gdat$Start, gdat$End)) + 100
     )
+    sequence = unique(gdat$Sequence)
+    if (length(sequence) > 1) {
+      stop("Attempting operon plot with multiple sequences.")
+    }
   }
 
   # Extract all gene data for the specified range
-  gdat = subset(gen, (Start >= genes_full_range[1] & Start <= genes_full_range[2]) | (End >= genes_full_range[1] & End <= genes_full_range[2]))
+  gdat = subset(gen,
+    ((Start >= genes_full_range[1] & Start <= genes_full_range[2]) |
+    (End >= genes_full_range[1] & End <= genes_full_range[2])) &
+    Sequence == sequence
+    )
 
   # Clip genes to range
   gdat$Start[gdat$Start <= genes_full_range[1]] = genes_full_range[1]
@@ -234,11 +265,19 @@ if (tolower(plot_type) == "operon"){
     gdat_exp = expand.genes(gdat)
     grpm = merge(
       gdat_exp,
-      subset(rpm, Position >= genes_full_range[1] & Position <= genes_full_range[2]),
+      subset(rpm,
+        Position >= genes_full_range[1] &
+        Position <= genes_full_range[2] &
+        Sequence == sequence
+        ),
       all.y=T
       )
   }else{
-    grpm = subset(rpm, Position >= genes_full_range[1] & Position <= genes_full_range[2])
+    grpm = subset(rpm,
+      Position >= genes_full_range[1] &
+      Position <= genes_full_range[2] &
+      Sequence == sequence
+      )
   }
 
   # Create GRanges object
