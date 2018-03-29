@@ -5,6 +5,8 @@ EXPERIMENT_NAME="ExperimentName"
 OUTDIR="YYYY.MM.DD.${EXPERIMENT_NAME}"
 THREADS="16"
 START_STEP=1
+GENOME_FASTA="/ssd/common/tools/ribopipe/reference_sequences/syn_PCC6803/NC_000911.1_chr_7plasmids.fasta"
+
 # Step-specific options
 
 # Step 1: Import data to working directory
@@ -29,7 +31,7 @@ sickle_l="6"
 bowtie_5_n="2"
 bowtie_5_l="28"
 bowtie_5_p="10"
-bowtie_5_ref="/ssd/common/tools/bowtie1-1.1.2/indexes/rRNAtRNA.syn6803.NC000911"
+bowtie_5_ref="/ssd/common/tools/ribopipe/reference_sequences/syn_PCC6803/rRNAtRNA.syn6803.NC000911"
 
 # Step 6: Map reads to the genome
 reverse_complement=true # Make input reads reverse-complement for e.g. NEBNext Directional
@@ -37,7 +39,7 @@ bowtie_6_m="1"
 bowtie_6_n="2"
 bowtie_6_l="28"
 bowtie_6_p="10"
-bowtie_6_ref="/ssd/common/tools/bowtie1-1.1.2/indexes/syn6803.NC_000911"
+bowtie_6_ref="/ssd/common/tools/ribopipe/reference_sequences/syn_PCC6803/NC_000911.1_chr_7plasmids"
 
 # Step 7: Count the number of reads on read-occupied positions in genome (PARALLEL)
 readCountScript="/ssd/common/tools/ribopipe/python/readCountScript.max48.sup2.RNAseq_mod.py"
@@ -49,10 +51,9 @@ totalNbrMappedReadsScript="/ssd/common/tools/ribopipe/python/totalNbrMappedReads
 RPMscript="/ssd/common/tools/ribopipe/python/RPMscript.sup6.py"
 
 # Step 10: Complete RPM list by assigning “0” to all unoccupied positions
-RPMcompleteScript="/ssd/common/tools/ribopipe/python/RPMcompleteScript.NC000911.sup7.py"
+RPMcompleteScript="/ssd/common/tools/ribopipe/python/RPMcompleteScript.sup7.py"
 
 # Step 11: Count the number of reads on every gene
 readsPerGeneScript="/ssd/common/tools/ribopipe/python/readsPerGeneScript.sup4.edited.py"
-genelistP="/ssd/jan/auxillaryData/genelists/syn6803.NC000911.genelist_p"
-genelistM="/ssd/jan/auxillaryData/genelists/syn6803.NC000911.genelist_m"
-genomeLength="3573470"
+genelistP="/ssd/common/tools/ribopipe/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist.p"
+genelistM="/ssd/common/tools/ribopipe/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist.m"

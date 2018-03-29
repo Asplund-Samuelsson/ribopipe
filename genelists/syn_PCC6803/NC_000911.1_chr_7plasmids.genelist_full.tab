@@ -1,4 +1,4 @@
-NC_000911.1	Type	Start	End	Locus_tag	Old_locus_tag	Product	Strand
+Sequence	Type	Start	End	Locus_tag	Old_locus_tag	Product	Strand
 NC_000911.1	CDS	-200	772	SGL_RS01875	slr0611	prenyltransferase	+
 NC_000911.1	CDS	811	1494	SGL_RS01880	slr0612	hypothetical protein	+
 NC_000911.1	CDS	1577	2098	SGL_RS01885	slr0613	hypothetical protein	+
@@ -3322,20 +3322,16 @@ NC_000911.1	CDS	3569134	3569523	SGL_RS18370	slr0607	cyclic nucleotide-binding do
 NC_000911.1	CDS	3569672	3570319	SGL_RS18375	slr0608	bifunctional phosphoribosyl-AMP	+
 NC_000911.1	CDS	3570424	3571575	SGL_RS18380	slr0609	GTP-binding protein	+
 NC_000911.1	CDS	3571711	3572403	SGL_RS18385	slr0610	ABC transporter permease	+
-NC_020289.1	Type	Start	End	Locus_tag	Old_locus_tag	Product	Strand
 NC_020289.1	CDS	648	1658	MYO_RS18430	MYO_710	hypothetical protein	+
 NC_020289.1	CDS	1836	2138	MYO_RS18435	MYO_720	hypothetical protein	+
-NC_020298.1	Type	Start	End	Locus_tag	Old_locus_tag	Product	Strand
 NC_020298.1	CDS	-750	429	MYO_RS18440	MYO_810	hypothetical protein	+
 NC_020298.1	CDS	850	1221	MYO_RS18445	MYO_820	hypothetical protein	+
 NC_020298.1	CDS	1221	1496	MYO_RS18450	MYO_830	hypothetical protein	+
-NC_020290.1	Type	Start	End	Locus_tag	Old_locus_tag	Product	Strand
 NC_020290.1	CDS	3	296	MYO_RS18455	MYO_610	hypothetical protein	-
 NC_020290.1	CDS	692	1045	MYO_RS18460	MYO_620	hypothetical protein	+
 NC_020290.1	CDS	1600	4515	MYO_RS18465	MYO_RS18465	DUF3854 domain-containing protein	+
 NC_020290.1	CDS	4578	4859	MYO_RS18470	MYO_640	hypothetical protein	+
 NC_020290.1	CDS	4861	5136	MYO_RS18475	MYO_650	hypothetical protein	+
-NC_005230.1	Type	Start	End	Locus_tag	Old_locus_tag	Product	Strand
 NC_005230.1	CDS	-1784	85	SGL_RS00625	sll7106	exodeoxyribonuclease V subunit alpha	-
 NC_005230.1	CDS	182	490	SGL_RS00630	sll7001	hypothetical protein	-
 NC_005230.1	CDS	706	1287	SGL_RS00635	sll7002	IS701 family transposase	-
@@ -3439,7 +3435,6 @@ NC_005230.1	CDS	98473	99015	SGL_RS01105	slr7101	hypothetical protein	+
 NC_005230.1	CDS	99125	100141	SGL_RS01110	slr7102	hypothetical protein	+
 NC_005230.1	CDS	100246	100632	SGL_RS01115	sll7103	exodeoxyribonuclease V alpha chain	-
 NC_005230.1	pseudoCDS	100781	101628	SGL_RS01120	SGL_RS01120	IS630 family transposase	+
-NC_005231.1	Type	Start	End	Locus_tag	Old_locus_tag	Product	Strand
 NC_005231.1	CDS	-1056	1914	SGL_RS01125	sll8049	type I restriction endonuclease subunit R	-
 NC_005231.1	CDS	1920	2966	SGL_RS01130	sll8001	Appr-1-p processing protein	-
 NC_005231.1	CDS	2983	3621	SGL_RS01135	sll8002	DUF4433 domain-containing protein	-
@@ -3488,7 +3483,6 @@ NC_005231.1	pseudoCDS	41056	41903	SGL_RS18575	SGL_RS18575	IS630 family transposa
 NC_005231.1	CDS	41994	42194	SGL_RS01350	ssr8047	hypothetical protein	+
 NC_005231.1	CDS	42203	42913	SGL_RS01355	sll8048	M48 family peptidase	-
 NC_005231.1	CDS	42903	43241	SGL_RS01360	SGL_RS01360	hypothetical protein	-
-NC_005229.1	Type	Start	End	Locus_tag	Old_locus_tag	Product	Strand
 NC_005229.1	CDS	-1497	27	SGL_RS00005	sll5132	DUF262 domain-containing protein	-
 NC_005229.1	CDS	195	374	SGL_RS18445	SGL_RS18445	hypothetical protein	-
 NC_005229.1	CDS	574	921	SGL_RS00010	sll5002	hypothetical protein	-
@@ -3626,7 +3620,6 @@ NC_005229.1	CDS	115503	116540	SGL_RS00605	sll5128	hypothetical protein	-
 NC_005229.1	CDS	116636	116830	SGL_RS00610	ssl5129	hypothetical protein	-
 NC_005229.1	CDS	116886	117293	SGL_RS00615	sll5130	HNH endonuclease	-
 NC_005229.1	CDS	117345	118361	SGL_RS00620	sll5131	IS4 family transposase IS4Sa	-
-NC_005232.1	Type	Start	End	Locus_tag	Old_locus_tag	Product	Strand
 NC_005232.1	CDS	-996	255	SGL_RS01365	slr6110	diguanylate phosphodiesterase	+
 NC_005232.1	CDS	465	3053	SGL_RS01370	slr6001	hybrid sensor histidine kinase/response	+
 NC_005232.1	CDS	3505	3753	SGL_RS01375	ssr6002	hypothetical protein	+
