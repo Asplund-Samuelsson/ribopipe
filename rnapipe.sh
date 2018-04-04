@@ -418,14 +418,13 @@ if [[ START_STEP -le S ]]
       out_p="${prefix}.RPM0.p"
       out_m="${prefix}.RPM0.m"
       # Run the zero count completion script with the supplied options
-      $RPMcompleteScript --inP $infile_p --inM $infile_m \
+      $RPMcompleteScript --inP $infile_p --inM $infile_m --inG $GENOME_FASTA \
       --outP $out_p --outM $out_m
     }
 
     # Export function and variables so that each subprocess can access them
     export -f run_complete
-    export RPMcompleteScript
-    export EXPERIMENT_NAME
+    export RPMcompleteScript EXPERIMENT_NAME GENOME_FASTA
 
     # Run zero count completion in parallel for the input files
     parallel --no-notice --jobs $THREADS run_complete ::: ${input_files_10[@]}
@@ -466,13 +465,13 @@ if [[ START_STEP -le S ]]
       # Run the reads per gene script with the supplied options
       $readsPerGeneScript --inP $infile_p --inM $infile_m \
       --listP $genelistP --listM $genelistM --outP $out_p --outM $out_m \
-      --gLen $genomeLength
+      --inG $GENOME_FASTA
     }
 
     # Export function and variables so that each subprocess can access them
     export -f run_genes
     export readsPerGeneScript genelistP genelistM genomeLength
-    export EXPERIMENT_NAME
+    export EXPERIMENT_NAME GENOME_FASTA
 
     # Run reads per gene counting in parallel for the input files
     parallel --no-notice --jobs $THREADS run_genes ::: ${input_files_11[@]}

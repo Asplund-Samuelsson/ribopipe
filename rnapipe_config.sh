@@ -51,7 +51,7 @@ totalNbrMappedReadsScript="/ssd/common/tools/ribopipe/python/totalNbrMappedReads
 RPMscript="/ssd/common/tools/ribopipe/python/RPMscript.sup6.py"
 
 # Step 10: Complete RPM list by assigning “0” to all unoccupied positions
-RPMcompleteScript="/ssd/common/tools/ribopipe/python/RPMcompleteScript.sup7.py"
+RPMcompleteScript="/ssd/common/tools/ribopipe/python/RPMcompleteScript.sup7.edited.py"
 
 # Step 11: Count the number of reads on every gene
 readsPerGeneScript="/ssd/common/tools/ribopipe/python/readsPerGeneScript.sup4.edited.py"
