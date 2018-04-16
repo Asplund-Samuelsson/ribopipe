@@ -186,20 +186,20 @@ fi
 
 
 ################################################################################
-# Step 6: Trim ends with low-quality base calls (PARALLEL)
+# Step 6: Filter reads with low-quality base calls (PARALLEL)
 S=6
 
 # Check starting step
 if [[ START_STEP -le S ]]
   then
     # Report progress
-    echo -e "\n\e[94mStep $S: Trimming ends with low-quality base calls...\e[0m\n"
+    echo -e "\n\e[94mStep $S: Removing reads with low-quality base calls...\e[0m\n"
 
     # Store input filenames in array (specific for step 6; files from step 4)
     input_files_6=(cutadapt/${EXPERIMENT_NAME}.*.cutadapt.fastq.gz)
 
     # Define run_sickle function to be used with GNU parallel application
-    run_sickle() {
+    run_filter() {
       # The infile name is stored in positional argument 1
       infile=$1
       # Extract the sample name from the infile
@@ -208,18 +208,19 @@ if [[ START_STEP -le S ]]
       prefix="highQuality/${EXPERIMENT_NAME}.${sample_name}"
       out_quality="${prefix}.quality.fastq"
       out_report="${prefix}.quality.report.txt"
-      # Run sickle with the supplied options
-      sickle se -f $infile -t $sickle_t -q $sickle_q -l $sickle_l \
-      -o $out_quality > $out_report
+      # Run seqmagick quality-filter with the supplied options
+      seqmagick quality-filter \
+      --min-mean-quality $filter_q --min-length $filter_l \
+      $infile $out_quality > $out_report
     }
 
     # Export function and variables so that each subprocess can access them
-    export -f run_sickle
-    export sickle_t sickle_q sickle_l
+    export -f run_filter
+    export filter_q filter_l
     export EXPERIMENT_NAME
 
     # Run sickle in parallel for the input files
-    parallel --no-notice --jobs $THREADS run_sickle ::: ${input_files_6[@]}
+    parallel --no-notice --jobs $THREADS run_filter ::: ${input_files_6[@]}
 
     # Report step done
     echo -e "\n\e[92mStep $S: Done.\e[0m\n"

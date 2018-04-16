@@ -29,10 +29,9 @@ cutadapt_e="0.15"
 # Step 5: Assess footprint-length distribution
 # None
 
-# Step 6: Trim ends with low-quality base calls (PARALLEL)
-sickle_t="sanger"
-sickle_q="20"
-sickle_l="6"
+# Step 6: Filter reads with low-quality base calls (PARALLEL)
+filter_q="30"
+filter_l="6"
 
 # Step 7: Remove rRNA and tRNA sequences
 bowtie_7_n="2"
