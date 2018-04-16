@@ -1,0 +1,284 @@
+
+### FILENAMES, SAMPLE IDS AND STRAND IDS #######################################
+
+# Define input directory
+indir="/hdd/common/proj/RibosomeProfiling/results/2018-03-26/CSD2_plasmid_test_2"
+
+# Define input file
+gen_file="results/2018-03-28/CSD2_3prime.with_plasmids.RPKM.tab"
+
+# List RPM0 filenames
+rpm_files = list.files(
+  path=paste(c(indir, "/RPM"), collapse=""), pattern="\\.RPM0\\.", full.names=T
+  )
+
+# List totalNbrMappedReads filenames
+gen_tc_files = list.files(
+  path=paste(c(indir, "/readcount"), collapse=""),
+  pattern="totalNbrMappedReads",
+  full.names=T
+  )
+
+# Obtain sample and strand IDs for RPM0 files in order
+rpm_samples = unlist(
+  lapply(lapply(strsplit(rpm_files, "\\."), tail, n=3L), head, n=1L)
+  )
+rpm_strands = ifelse(
+  unlist(lapply(strsplit(rpm_files, "\\."), tail, n=1L)) == "p",
+  "+",
+  "-"
+  )
+
+# Obtain sample and strand IDs for readsPerGene files in order
+gen_tc_samples = unlist(
+  lapply(lapply(strsplit(gen_tc_files, "\\."), tail, n=2L), head, n=1L)
+  )
+
+### LOAD DATA ##################################################################
+
+# Load the files
+library(data.table)
+library(dplyr)
+gen = read.table(gen_file, header=T, stringsAsFactors=F, sep="\t")
+rpm_data = lapply(rpm_files, fread, header=F)
+gen_tc_data = unlist(lapply(gen_tc_files, scan))
+
+# Create total count data frames with sample names
+tc_gen = data.frame(Sample = gen_tc_samples, TotalReads = gen_tc_data)
+
+# Add columns with sample and strand IDs to each dataframe
+for( i in seq_along(rpm_data)){
+  rpm_data[[i]] = cbind(as.data.frame(rpm_data[[i]]), Sample=rpm_samples[i])
+  rpm_data[[i]] = cbind(as.data.frame(rpm_data[[i]]), strand=rpm_strands[i])
+}
+
+# Create one dataframe for RPM data
+rpm = as.data.frame(rbindlist(rpm_data))
+colnames(rpm)[1:3] = c("Sequence", "Position", "RPM")
+
+# Shift RPM values
+shift = -12
+
+# Change position by the shift
+rpm_shift = rpm
+rpm_shift$Position = ifelse(
+  rpm_shift$strand == "+",
+  rpm_shift$Position + shift,
+  rpm_shift$Position - shift
+  )
+
+# Fold around beginning of circular genome
+sequence_sizes = aggregate(Position ~ Sequence, rpm, max)
+colnames(sequence_sizes)[2] = "Size"
+
+rpm_shift = inner_join(rpm_shift, sequence_sizes)
+
+rpm_shift$Position = ifelse(
+  rpm_shift$Position < 1,
+  rpm_shift$Position + rpm_shift$Size,
+  ifelse(
+    rpm_shift$Position > rpm_shift$Size,
+    rpm_shift$Position - rpm_shift$Size,
+    rpm_shift$Position
+    )
+  )
+
+rpm = rpm_shift[,c("Sequence","Position","RPM","Sample","strand")]
+
+# Reconstruct per-position read count
+rpm = inner_join(rpm, tc_gen)
+rpm$Reads = rpm$RPM * rpm$TotalReads / 1000000
+
+# Calculate RPK
+gen$RPK_gene = 1000 * gen$Reads / gen$Length
+rpm$RPK_nucl = 1000 * rpm$Reads
+
+### ANALYZE ####################################################################
+
+# Expand each gene to all positions
+gen_allpos = as.data.frame(rbindlist(lapply(
+  unique(gen$Name),
+  function (x) {
+    gen_s = subset(gen, Name == x)
+    Position = (unique(gen_s$Start) - 50):(unique(gen_s$End) + 50)
+    merge(gen_s, data.frame(Position = Position))
+    }
+)))
+
+# Fold around beginning of circular genome
+gen_allpos = inner_join(gen_allpos, sequence_sizes)
+
+gen_allpos$Position = ifelse(
+  gen_allpos$Position < 1,
+  gen_allpos$Position + gen_allpos$Size,
+  ifelse(
+    gen_allpos$Position > gen_allpos$Size,
+    gen_allpos$Position - gen_allpos$Size,
+    gen_allpos$Position
+    )
+  )
+
+# Add shifted RPM data
+gen_allpos = inner_join(
+  gen_allpos, rpm[,c("Sequence","strand","Position","Sample","RPK_nucl")]
+  )
+
+# Calculate PauseScore
+gen_allpos$PauseScore = gen_allpos$RPK_nucl / gen_allpos$RPK_gene
+
+# Calculate relative position
+gen_allpos$RelPos = ifelse(
+  gen_allpos$strand == "+",
+  gen_allpos$Position - gen_allpos$Start,
+  gen_allpos$End - gen_allpos$Position
+  )
+
+# Calculate relative position for genes crossing position 1
+gen_allpos$RelPos = ifelse(
+  gen_allpos$Start < 1,
+  # Treat only genes crossing position 1
+  ifelse(
+      gen_allpos$Position > gen_allpos$End + 50,
+      # Return to negative positions if before 1
+      ifelse(
+        gen_allpos$strand == "+",
+        (gen_allpos$Position - gen_allpos$Size) - gen_allpos$Start - 1,
+        gen_allpos$End - (gen_allpos$Position - gen_allpos$Size)
+        ),
+      ifelse(
+        gen_allpos$strand == "+",
+        # Plus-strand genes should end on rel. pos. length - 1 (starts at 0)
+        gen_allpos$Position - gen_allpos$Start - 1,
+        gen_allpos$End - gen_allpos$Position
+        )
+    ),
+  # If the gene does not cross position 1, keep relative position as it is
+  gen_allpos$RelPos
+  )
+
+straddle_genes = unique(
+  gen_allpos[gen_allpos$Position > gen_allpos$End + 50,]$Name
+  )
+
+other_genes = c(
+  sample(unique(
+    subset(gen_allpos, strand == "+" & !(Name %in% straddle_genes))$Name), 3),
+  sample(unique(
+    subset(gen_allpos, strand == "-" & !(Name %in% straddle_genes))$Name), 3)
+  )
+
+# Manually checking the calculated relative positions
+# Seems good
+
+control_plus = subset(
+  gen_allpos,
+  !(Name %in% straddle_genes)
+  & (RelPos == 0 | RelPos == Length -1)
+  & strand == "+"
+)[,c(1:5,10,13,14,17)]
+
+control_minus = subset(
+  gen_allpos,
+  !(Name %in% straddle_genes)
+  & (RelPos == 0 | RelPos == Length -1)
+  & strand == "-"
+)[,c(1:5,10,13,14,17)]
+
+sum(ifelse(
+  control_plus$RelPos == 0,
+  control_plus$Position == control_plus$Start,
+  control_plus$Position == control_plus$End
+)) == nrow(control_plus)
+
+sum(ifelse(
+    control_minus$RelPos == 0,
+    control_minus$Position == control_minus$End,
+    control_minus$Position == control_minus$Start
+)) == nrow(control_minus)
+
+# It seems to have worked
+
+# Rename to gene_profiles
+gene_profiles = gen_allpos
+
+# Save results as table
+write.table(
+  gene_profiles,
+  "results/2018-04-04/gene_PauseScore_profiles.with_plasmids.1.tab",
+  quote=F, sep="\t", row.names=F, col.names=T
+  )
+
+# Calculate distance from end of gene, and subset for 5 and 3 prime ends
+gene_profiles$RelPosFromEnd = gene_profiles$RelPos - gene_profiles$Length + 1
+gene_prof_5prime = filter(gene_profiles, RelPos %in% -50:150)
+gene_prof_3prime = filter(gene_profiles, RelPosFromEnd %in% -150:50)
+
+# Calculate medians
+median_profile_5prime = aggregate(PauseScore ~ Sample + RelPos, gene_prof_5prime, median)
+median_profile_3prime = aggregate(PauseScore ~ Sample + RelPosFromEnd, gene_prof_3prime, median)
+
+# Medians are nearly always zero; NOT WITH FILTERING
+mean_profile_5prime = aggregate(PauseScore ~ Sample + RelPos, gene_prof_5prime, mean)
+mean_profile_3prime = aggregate(PauseScore ~ Sample + RelPosFromEnd, gene_prof_3prime, mean)
+
+### PLOT #######################################################################
+
+library(ggplot2)
+
+# Combine mean, median, and both ends into one dataframe
+median_profile_3prime$Part = "3_prime"
+median_profile_3prime$Variable = "Median"
+median_profile_5prime$Part = "5_prime"
+median_profile_5prime$Variable = "Median"
+
+mean_profile_3prime$Part = "3_prime"
+mean_profile_3prime$Variable = "Mean"
+mean_profile_5prime$Part = "5_prime"
+mean_profile_5prime$Variable = "Mean"
+
+colnames(median_profile_3prime)[2] = "RelPos"
+colnames(mean_profile_3prime)[2] = "RelPos"
+
+average_profiles = rbind(
+  mean_profile_5prime, mean_profile_3prime,
+  median_profile_5prime, median_profile_3prime
+  )
+
+average_profiles$Part = factor(average_profiles$Part, levels = c("5_prime","3_prime"))
+
+# Mean or median lines of all genes, by part of ORF, coloured by sample
+gp = ggplot(average_profiles, aes(x=RelPos, y=PauseScore, colour=Sample))
+gp = gp + geom_line(alpha=0.5)
+gp = gp + theme_bw()
+gp = gp + scale_colour_manual(values=c("#1b7837","#5aae61","#a6dba0","#d9f0d3","#762a83"))
+gp = gp + facet_grid(Variable ~ Part, scales="free")
+gp = gp + scale_y_log10()
+gp = gp + scale_x_continuous(minor_breaks=seq(-174, 168, 3))
+ggsave("art/2018-04-04/average_gene_profile.with_plasmids.1.means_and_medians.pdf", gp, height=180/25.4, width=320/25.4)
+
+# Jan wants to see what it looks like with just RPM values and not pause scores
+
+# # Calculate means of raw RPM
+# mean_profile_5prime = aggregate(RPKM_nucl/1000 ~ Sample + RelPos, gene_prof_5prime, mean)
+# mean_profile_3prime = aggregate(RPKM_nucl/1000 ~ Sample + RelPosFromEnd, gene_prof_3prime, mean)
+#
+# # Combine mean, median, and both ends into one dataframe
+# mean_profile_3prime$Part = "3_prime"
+# mean_profile_5prime$Part = "5_prime"
+#
+# colnames(mean_profile_3prime)[2:3] = c("RelPos", "RPM")
+# colnames(mean_profile_5prime)[3] = "RPM"
+#
+# average_profiles = rbind(mean_profile_5prime, mean_profile_3prime)
+#
+# average_profiles$Part = factor(average_profiles$Part, levels = c("5_prime","3_prime"))
+#
+# # Mean or median lines of all genes, by part of ORF, coloured by sample
+# gp = ggplot(average_profiles, aes(x=RelPos, y=RPM, colour=Sample))
+# gp = gp + geom_line(alpha=0.5)
+# gp = gp + theme_bw()
+# gp = gp + scale_colour_manual(values=c("#1b7837","#5aae61","#a6dba0","#d9f0d3","#762a83"))
+# gp = gp + facet_grid(. ~ Part, scales="free")
+# gp = gp + scale_y_log10()
+# gp = gp + scale_x_continuous(minor_breaks=seq(-174, 168, 3))
+# ggsave("art/2018-04-03/average_gene_profile.with_plasmids.1.RPM_means.pdf", gp, height=100/25.4, width=320/25.4)
