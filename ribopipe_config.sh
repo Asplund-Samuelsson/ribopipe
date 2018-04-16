@@ -30,7 +30,7 @@ cutadapt_e="0.15"
 # None
 
 # Step 6: Filter reads with low-quality base calls (PARALLEL)
-filter_q="30"
+filter_q="25"
 filter_l="6"
 
 # Step 7: Remove rRNA and tRNA sequences
