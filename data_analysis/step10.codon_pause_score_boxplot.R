@@ -6,7 +6,7 @@ translation_file = args[1]
 colour_file = args[2]
 
 # Define infiles
-codon_rpm_file = "analysis/codon_PauseScore_medians.tab"
+codon_rpm_file = "analysis/codon_PauseScore_quantiles.tab"
 
 # Load data
 codon = read.table(codon_rpm_file, header=T, sep="\t", stringsAsFactors=F)
