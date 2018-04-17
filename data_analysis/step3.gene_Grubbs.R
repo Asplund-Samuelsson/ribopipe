@@ -1,8 +1,9 @@
+#!/usr/bin/env Rscript
 
 ### FILENAMES, SAMPLE IDS AND STRAND IDS #######################################
 
 # Define input file
-infile="results/2018-03-28/CSD2_3prime.with_plasmids.RPKM.tab"
+infile="analysis/gene_RPKM.tab"
 
 ### LOAD DATA ##################################################################
 
@@ -78,7 +79,7 @@ t_data$log2_change = log2(t_data$RPKM_late / t_data$RPKM_early)
 # Save Bonferroni adjusted test results table
 write.table(
   t_data,
-  "results/2018-03-29/ribo_Grubbs.CSD2.Bonferroni_adjusted.with_plasmids.asinh.tab",
+  "analysis/gene_Grubbs.Bonferroni_adjusted.asinh.tab",
   quote=F, row.names=F, col.names=T, sep="\t"
   )
 
@@ -104,6 +105,6 @@ t_data = merge(t_data, merge(early_RPKM, late_RPKM))
 # Save Bonferroni adjusted test results table
 write.table(
   t_data,
-  "results/2018-03-29/ribo_Grubbs.CSD2.BH_adjusted.with_plasmids.asinh.tab",
+  "analysis/ribo_Grubbs.BH_adjusted.asinh.tab",
   quote=F, row.names=F, col.names=T, sep="\t"
   )

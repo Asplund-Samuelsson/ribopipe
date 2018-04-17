@@ -1,11 +1,12 @@
+#!/usr/bin/env Rscript
 
 ### FILENAMES, SAMPLE IDS AND STRAND IDS #######################################
 
 # Define input directory
-indir="/hdd/common/proj/RibosomeProfiling/results/2018-03-26/CSD2_plasmid_test_2"
+indir="."
 
 # Define input file
-gen_file="results/2018-03-28/CSD2_3prime.with_plasmids.RPKM.tab"
+gen_file="analysis/gene_RPKM.tab"
 
 # List RPM0 filenames
 rpm_files = list.files(
@@ -204,7 +205,7 @@ gene_profiles = gen_allpos
 # Save results as table
 write.table(
   gene_profiles,
-  "results/2018-04-04/gene_PauseScore_profiles.with_plasmids.1.tab",
+  "analysis/gene_PauseScore_profiles.tab",
   quote=F, sep="\t", row.names=F, col.names=T
   )
 
@@ -254,31 +255,4 @@ gp = gp + scale_colour_manual(values=c("#1b7837","#5aae61","#a6dba0","#d9f0d3","
 gp = gp + facet_grid(Variable ~ Part, scales="free")
 gp = gp + scale_y_log10()
 gp = gp + scale_x_continuous(minor_breaks=seq(-174, 168, 3))
-ggsave("art/2018-04-04/average_gene_profile.with_plasmids.1.means_and_medians.pdf", gp, height=180/25.4, width=320/25.4)
-
-# Jan wants to see what it looks like with just RPM values and not pause scores
-
-# # Calculate means of raw RPM
-# mean_profile_5prime = aggregate(RPKM_nucl/1000 ~ Sample + RelPos, gene_prof_5prime, mean)
-# mean_profile_3prime = aggregate(RPKM_nucl/1000 ~ Sample + RelPosFromEnd, gene_prof_3prime, mean)
-#
-# # Combine mean, median, and both ends into one dataframe
-# mean_profile_3prime$Part = "3_prime"
-# mean_profile_5prime$Part = "5_prime"
-#
-# colnames(mean_profile_3prime)[2:3] = c("RelPos", "RPM")
-# colnames(mean_profile_5prime)[3] = "RPM"
-#
-# average_profiles = rbind(mean_profile_5prime, mean_profile_3prime)
-#
-# average_profiles$Part = factor(average_profiles$Part, levels = c("5_prime","3_prime"))
-#
-# # Mean or median lines of all genes, by part of ORF, coloured by sample
-# gp = ggplot(average_profiles, aes(x=RelPos, y=RPM, colour=Sample))
-# gp = gp + geom_line(alpha=0.5)
-# gp = gp + theme_bw()
-# gp = gp + scale_colour_manual(values=c("#1b7837","#5aae61","#a6dba0","#d9f0d3","#762a83"))
-# gp = gp + facet_grid(. ~ Part, scales="free")
-# gp = gp + scale_y_log10()
-# gp = gp + scale_x_continuous(minor_breaks=seq(-174, 168, 3))
-# ggsave("art/2018-04-03/average_gene_profile.with_plasmids.1.RPM_means.pdf", gp, height=100/25.4, width=320/25.4)
+ggsave("analysis/average_gene_profile.means_and_medians.pdf", gp, height=180/25.4, width=320/25.4)

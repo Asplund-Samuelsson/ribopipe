@@ -1,11 +1,11 @@
+#!/usr/bin/env Rscript
 
 ### FILENAMES, SAMPLE IDS AND STRAND IDS #######################################
 
-# Define input directories
-indir="/hdd/common/proj/RibosomeProfiling/results/2018-03-26/CSD2_plasmid_test_2"
-
-# Define codon file
-codon_file = "data/2018-03-28/Syn_PCC6803.1_chro_7plasmids.seq_gene_codon_seqpos_strand_genpos123.tab"
+# Load command line arguments
+args = commandArgs(trailingOnly=T)
+codon_file = args[1]
+indir = "." # A ribopipe results directory
 
 # List RPM0 filenames
 rpm_files = list.files(
@@ -182,7 +182,7 @@ genes_below_threshold = as.character(unique(subset(gen, Reads < 128)$Name))
 
 gen = subset(gen, !(Name %in% genes_below_threshold))
 
-write(unique(gen_allpos$Name), "data/2018-03-29/128r_genes.with_plasmids.txt")
+write(unique(gen_allpos$Name), "analysis/128r_genes.txt")
 
 # Calculate gene length
 gen$Length = gen$End - gen$Start + 1
@@ -197,7 +197,7 @@ gen$RPKM = 1000 * gen$RPM / gen$Length
 
 write.table(
   gen,
-  "results/2018-03-28/CSD2_3prime.with_plasmids.RPKM.tab",
+  "analysis/gene_RPKM.tab",
   quote=F, sep="\t", row.names=F, col.names=T
   )
 
@@ -251,20 +251,20 @@ colnames(psMAD) = c("Codon", "Sample", "PauseScore", "psMAD")
 # Save the table of medians
 write.table(
   psMAD,
-  "results/2018-03-28/codon_PauseScore_medians.with_plasmids.tab",
+  "analysis/codon_PauseScore_medians.tab",
   quote=F, sep="\t", row.names=F, col.names=T
   )
 
 # Save the table of codon RPM values and pause scores
 write.table(
   codon_rpm,
-  "results/2018-03-28/codon_PauseScore.with_plasmids.tab",
+  "analysis/codon_PauseScore.tab",
   quote=F, sep="\t", row.names=F, col.names=T
   )
 
 # Save the shifted RPM values
 write.table(
   gen_allpos[,c("Sequence", "Name", "strand", "Position", "Sample", "Reads", "RPM")],
-  "results/2018-03-28/CSD2_3prime.RPM_ORF.with_plasmids.tab",
+  "analysis/RPM_ORF.tab",
   quote=F, sep="\t", row.names=F, col.names=T
   )

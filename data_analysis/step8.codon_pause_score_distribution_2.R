@@ -1,11 +1,11 @@
+#!/usr/bin/env Rscript
 
 ### FILENAMES, SAMPLE IDS AND STRAND IDS #######################################
 
-# Define input directories
-indir="/hdd/common/proj/RibosomeProfiling/results/2018-03-26/CSD2_plasmid_test_2"
-
-# Define codon file
-codon_file = "data/2018-03-28/Syn_PCC6803.1_chro_7plasmids.seq_gene_codon_seqpos_strand_genpos123.tab"
+# Load command line arguments
+args = commandArgs(trailingOnly=T)
+codon_file = args[1]
+indir = "." # A ribopipe results directory
 
 # List RPM0 filenames
 rpm_files = list.files(
@@ -238,6 +238,6 @@ codon_quantiles = codon_quantiles[,c(1:2,4:ncol(codon_quantiles))]
 # Save the table of medians
 write.table(
   codon_quantiles,
-  "results/2018-04-04/codon_PauseScore_quantiles.with_plasmids.1.tab",
+  "analysis/codon_PauseScore_quantiles.tab",
   quote=F, sep="\t", row.names=F, col.names=T
   )

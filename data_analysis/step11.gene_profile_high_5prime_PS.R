@@ -1,8 +1,9 @@
+#!/usr/bin/env Rscript
 
 ### FILENAMES, SAMPLE IDS AND STRAND IDS #######################################
 
 # Define input file
-prof_file="results/2018-04-04/gene_PauseScore_profiles.with_plasmids.1.tab.gz"
+prof_file="analysis/gene_PauseScore_profiles.tab.gz"
 
 ### LOAD DATA ##################################################################
 
@@ -24,14 +25,11 @@ gene_prof_5prime_highPS = subset(gene_prof_5prime, PauseScore >= 1)
 # How many genes?
 high_PS_genes = unique(gene_prof_5prime_highPS$Name)
 
-# It's 2474 genes, a bit much.
-
 # Try different cutoffs
-high_PS_genes = unique(subset(gene_prof_5prime, PauseScore >= 2)$Name) # 2058
-high_PS_genes = unique(subset(gene_prof_5prime, PauseScore >= 1000)$Name) # 19
+high_PS_genes = unique(subset(gene_prof_5prime, PauseScore >= 1000)$Name)
 
-# Write those 18 genes to a file
-write(high_PS_genes, "results/2018-04-04/high_5prime_PS_genes.with_plasmids.txt")
+# Write genes to a file
+write(high_PS_genes, "analysis/high_5prime_PS_genes.txt")
 
 # Calculate average pause score in the 5' region
 # If the pause score is close to one, it might indicate an extension
@@ -41,8 +39,8 @@ avg_PS_5p = aggregate(PauseScore ~ Sample + Name, gene_prof_5prime, mean)
 # Try different ranges of average pause scores
 candidate_genes = unique(subset(avg_PS_5p, PauseScore >= 0.99 & PauseScore <= 1.01)$Name)
 
-# Write those 33 genes to a file
-write(candidate_genes, "results/2018-04-04/similar_5prime_PS_genes.with_plasmids.txt")
+# Write genes to a file
+write(candidate_genes, "analysis/similar_5prime_PS_genes.txt")
 
 # Look at the range up to -25 (that's where the RPM drops off)
 avg_PS_5p_25 = aggregate(
@@ -53,5 +51,5 @@ avg_PS_5p_25 = aggregate(
 
 candidate_genes = unique(subset(avg_PS_5p_25, PauseScore >= 10)$Name)
 
-# Writing the 133 genes to a file
-write(candidate_genes, "results/2018-04-04/25nt_5prime_PS_ge10_genes.with_plasmids.txt")
+# Writing genes to a file
+write(candidate_genes, "analysis/25nt_5prime_PS_ge10_genes.txt")

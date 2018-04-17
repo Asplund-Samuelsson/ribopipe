@@ -1,7 +1,13 @@
+#!/usr/bin/env Rscript
+
+# Load command line arguments
+args = commandArgs(trailingOnly=T)
+translation_file = args[1]
+colour_file = args[2]
+
 # Define infiles
-codon_rpm_file = "results/2018-03-28/codon_PauseScore_medians.with_plasmids.tab"
-translation_file = "data/2017-11-21/translation_table_11.tab"
-codon_abundance_file = "data/2018-04-04/Synechocystis_PCC_6803_chr.count_codon.with_plasmids.tab"
+codon_rpm_file = "analysis/codon_PauseScore_medians.tab"
+codon_abundance_file = "analysis/count_codon.tab"
 
 # Load data
 codon = read.table(codon_rpm_file, header=T, sep="\t", stringsAsFactors=F)
@@ -16,7 +22,6 @@ colnames(codon_abundance) = c("Count", "Codon")
 codon = merge(codon, t_table)
 
 # Add colours for amino acids
-colour_file = "../main/art/2016-09-30/colours.txt"
 colours = scan(colour_file, character(), quote = "")
 colours = c("#bdbdbd", colours, "#fc4e2a") # Add additional AA and STOP colours
 
@@ -62,6 +67,6 @@ gp = gp + scale_fill_manual(values=colours)
 gp = gp + theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust = 1, size=7))
 
 ggsave(
-  "art/2018-04-04/pause_score_ordered_codon_abundances.2.pdf",
+  "analysis/pause_score_ordered_codon_abundances.pdf",
   gp, width=240/25.4, height=100/25.4
   )

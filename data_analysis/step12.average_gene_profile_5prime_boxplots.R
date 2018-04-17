@@ -1,8 +1,9 @@
+#!/usr/bin/env Rscript
 
 ### LOAD DATA ##################################################################
 
 # Define input file
-infile = "results/2018-04-04/gene_PauseScore_profiles.with_plasmids.1.tab.gz"
+infile = "analysis/gene_PauseScore_profiles.tab.gz"
 
 # Load the file
 library(data.table)
@@ -65,7 +66,7 @@ make_bar = function(sample){
 
 S = c("A","B","C","D","E")
 
-outfile = "art/2018-04-04/5prime_PauseScore_boxplots.with_plasmids.1.pdf"
+outfile = "analysis/5prime_PauseScore_boxplots.pdf"
 pdf(outfile, width=210/25.4, height=750/25.4, onefile=FALSE)
 ggarrange(
   plots=c(rbind(lapply(S, make_box), lapply(S, make_bar))),

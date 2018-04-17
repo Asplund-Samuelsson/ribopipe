@@ -1,11 +1,13 @@
+#!/usr/bin/env Rscript
 
 ### FILENAMES, SAMPLE IDS AND STRAND IDS #######################################
 
-# Define input directories
-RNAdir="/hdd/common/proj/RNAseq/results/2018-03-29/CO2_lim_with_plasmids"
+# Load command line arguments
+args = commandArgs(trailingOnly=T)
+RNAdir = args[1]
 
 # Define input file
-ribo_file="results/2018-03-28/CSD2_3prime.with_plasmids.RPKM.tab"
+ribo_file="analysis/gene_RPKM.tab"
 
 # List readsPerGene filenames
 rna_files = list.files(
@@ -110,7 +112,7 @@ points_abline = function(data, mapping, ...){
 }
 
 # Plot all samples versus eachother
-png("art/2018-04-03/rnaseq_vs_ribprof.with_plasmids.1.png", height = 800, width = 800)
+png("analysis/rnaseq_vs_ribprof.png", height = 800, width = 800)
 g <- ggpairs(
   log10(gen_wide[,2:5]),
   lower = list(continuous = points_abline,
@@ -126,7 +128,7 @@ gen_wide$fold_rib = gen_wide$E / gen_wide$A
 gen_wide$fold_rna = gen_wide$time24 / gen_wide$time0
 
 # Plot fold changes versus eachother
-png("art/2018-04-03/rnaseq_vs_ribprof.with_plasmids.fold_change.1.png", height = 600, width = 600)
+png("analysis/rnaseq_vs_ribprof.fold_change.png", height = 600, width = 600)
 g <- ggpairs(
   log10(gen_wide[,6:7]),
   lower = list(continuous = points_abline,
@@ -142,7 +144,7 @@ gen_wide$TE_t0 = gen_wide$A / gen_wide$time0
 gen_wide$TE_t24 = gen_wide$E / gen_wide$time24
 
 # Plot TE versus eachother
-png("art/2018-04-03/rnaseq_vs_ribprof.with_plasmids.TE.1.png", height = 600, width = 600)
+png("analysis/rnaseq_vs_ribprof.TE.png", height = 600, width = 600)
 g <- ggpairs(
   log10(gen_wide[,8:9]),
   lower = list(continuous = points_abline,
@@ -165,7 +167,7 @@ gp = gp + scale_x_log10()
 gp = gp + annotation_logticks(sides="b")
 
 ggsave(
-  "art/2018-04-03/rnaseq_vs_ribprof.with_plasmids.TE_distribution.1.pdf",
+  "analysis/rnaseq_vs_ribprof.TE_distribution.pdf",
   gp, height = 90/25.4, width = 180/25.4
 )
 
@@ -186,7 +188,7 @@ gp = gp + annotation_logticks(sides="bl")
 gp = gp + scale_colour_manual(values=c("#1b7837","#762a83"))
 
 ggsave(
-  "art/2018-04-03/rnaseq_vs_ribprof.with_plasmids.TE_vs_RNAseq.1.pdf",
+  "analysis/rnaseq_vs_ribprof.TE_vs_RNAseq.pdf",
   gp, height = 90/25.4, width = 180/25.4
 )
 
@@ -194,7 +196,7 @@ ggsave(
 gen_wide$fold_TE = gen_wide$TE_t24 / gen_wide$TE_t0
 
 # Plot fold changes versus eachother
-png("art/2018-04-03/rnaseq_vs_ribprof.with_plasmids.TE_vs_RNAseq_fold_change.1.png", height = 600, width = 600)
+png("analysis/rnaseq_vs_ribprof.TE_vs_RNAseq_fold_change.png", height = 600, width = 600)
 g <- ggpairs(
   log10(gen_wide[,c(10,7)]),
   lower = list(continuous = points_abline,

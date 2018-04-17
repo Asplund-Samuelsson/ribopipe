@@ -4,8 +4,17 @@
 import re
 
 # Define infiles
-genome_fasta = "/ssd/common/tools/ribopipe/reference_sequences/syn_PCC6803/NC_000911.1_chr_7plasmids.fasta"
-CDS_file = "data/2018-03-28/Syn_PCC6803.1_chr_7plasmids.no_pseudo.CDS.tab"
+import argparse
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument('--inGen', help='Genome fasta.')
+parser.add_argument('--inCDS', help='CDS file.')
+
+args = parser.parse_args()
+
+genome_fasta = args.inGen
+CDS_file = args.inCDS
 
 # Load genome sequence
 genome_sequence = {}

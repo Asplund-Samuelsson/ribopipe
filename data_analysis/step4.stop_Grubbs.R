@@ -1,18 +1,17 @@
+#!/usr/bin/env Rscript
 
 ### FILENAMES, SAMPLE IDS AND STRAND IDS #######################################
 
 # Define input directory
-indir="/ssd/common/proj/RibosomeProfiling/ribopipe_testing/CSD2_3prime"
+indir="."
 
 # Define input file
-infile="results/2018-02-07/CSD2_3prime.full_-12_shift.RPKM.tab"
-codon_file="results/2018-03-28/codon_PauseScore.with_plasmids.tab.gz"
+codon_file="analysis/codon_PauseScore.tab.gz"
 
 ### LOAD DATA ##################################################################
 
 # Load the files
 library(data.table)
-gen = read.table(infile, header=T, stringsAsFactors=F, sep="\t")
 codon_rpm = as.data.frame(fread(
   paste(c("gzip -dc ", codon_file), collapse=""),
   header=T, stringsAsFactors=F, sep="\t"
@@ -87,7 +86,7 @@ t_data$log2_change = log2(t_data$PS_late / t_data$PS_early)
 # Save Bonferroni adjusted test results table
 write.table(
   t_data,
-  "results/2018-03-29/ribo_Grubbs_stop_codon.CSD2.Bonferroni_adjusted.with_plasmids.tab",
+  "analysis/stop_Grubbs.Bonferroni_adjusted.tab",
   quote=F, row.names=F, col.names=T, sep="\t"
   )
 
@@ -113,6 +112,6 @@ t_data = merge(t_data, merge(early_PS, late_PS))
 # Save Bonferroni adjusted test results table
 write.table(
   t_data,
-  "results/2018-03-29/ribo_Grubbs_stop_codon.CSD2.BH_adjusted.with_plasmids.tab",
+  "analysis/stop_Grubbs.BH_adjusted.tab",
   quote=F, row.names=F, col.names=T, sep="\t"
   )
