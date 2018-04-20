@@ -139,8 +139,9 @@ if [[ START_STEP -le S ]]
     # Report progress
     echo -e "\n\e[94mStep $S: Calculating average gene profile...\e[0m\n"
 
-    # Run script
+    # Run scripts
     $script_06
+    $script_06_b
 
     # Gzip big file
     pigz analysis/gene_PauseScore_profiles.tab

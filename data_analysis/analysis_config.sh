@@ -28,6 +28,7 @@ rnadir="/hdd/common/proj/RNAseq/results/2018-03-29/CO2_lim_with_plasmids"
 
 # Step 6: Average gene profile
 script_06="${RIBODIR}/data_analysis/step6.average_gene_profile.R"
+script_06_b="${RIBODIR}/data_analysis/step6b.average_gene_profile.R"
 
 # Step 7: Codon PS by sample
 script_07="${RIBODIR}/data_analysis/step7.pause_score_A_vs_E.R"
