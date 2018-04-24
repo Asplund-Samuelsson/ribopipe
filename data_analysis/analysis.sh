@@ -275,7 +275,7 @@ if [[ START_STEP -le S ]]
     '/ssd/common/tools/ribopipe/plot_genes.R . {} operon -12 analysis/high_5prime_PS_genes/closer/{}.25nt_5prime_PS_ge10.pdf'
 
     cat analysis/significant_5prime_PS_genes.txt | parallel --no-notice --jobs 7 \
-    '/ssd/common/tools/ribopipe/plot_genes.R . {} operon -12 analysis/high_5prime_PS_genes/closer/{}.significant_5prime_PS.pdf'
+    '/ssd/common/tools/ribopipe/plot_genes.R . {} operon -12 analysis/high_5prime_PS_genes/significant/{}.significant_5prime_PS.pdf'
 
     # Report step done
     echo -e "\n\e[92mStep $S: Done.\e[0m\n"
