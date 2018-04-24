@@ -182,7 +182,7 @@ genes_below_threshold = as.character(unique(subset(gen, Reads < 128)$Name))
 
 gen = subset(gen, !(Name %in% genes_below_threshold))
 
-write(unique(gen_allpos$Name), "analysis/128r_genes.txt")
+write(unique(gen$Name), "analysis/128r_genes.txt")
 
 # Calculate gene length
 gen$Length = gen$End - gen$Start + 1

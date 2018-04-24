@@ -1,8 +1,8 @@
 # Configuration file for the ribosome profiling data analysis pipeline
 
 # Universal options
-EXPERIMENT_NAME="ExperimentName"
-OUTDIR="YYYY.MM.DD.${EXPERIMENT_NAME}"
+EXPERIMENT_NAME="CSD2_seqmagick"
+OUTDIR="/hdd/common/proj/RibosomeProfiling/results/2018-04-16/${EXPERIMENT_NAME}"
 START_STEP=1 # Auto-stop after step 5 unless skipped. Continue from step 6.
 RIBODIR="/home/johannes/proj/ribo/tools/ribopipe"
 GENOME_FASTA="${RIBODIR}/reference_sequences/syn_PCC6803/NC_000911.1_chr_7plasmids.fasta"

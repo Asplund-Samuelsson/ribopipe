@@ -4,6 +4,7 @@
 
 # Define input file
 infile = "analysis/gene_PauseScore_profiles.tab.gz"
+# infile = "/hdd/common/proj/RibosomeProfiling/results/2018-04-23/gene_PauseScore_profiles.NO_MULTI_ORF_POS.NO_ORF_BELOW_128R.tab.gz"
 
 # Load the file
 library(data.table)
@@ -16,9 +17,8 @@ gene_profiles = as.data.frame(fread(
 # Clean up data
 gene_profiles = gene_profiles[is.finite(gene_profiles$PauseScore),]
 
-# Calculate distance from end of gene, and subset for 5 and 3 prime ends
-gene_profiles$RelPosFromEnd = gene_profiles$RelPos - gene_profiles$Length + 1
-gene_prof_5prime = subset(gene_profiles, RelPos %in% -50:0)
+# Subset to 5 prime end
+gene_prof_5prime = subset(gene_profiles, RelPos %in% -50:50)
 
 # Calculate number of zero and non-zero
 gene_prof_5prime_zeros = aggregate(
@@ -67,7 +67,8 @@ make_bar = function(sample){
 S = c("A","B","C","D","E")
 
 outfile = "analysis/5prime_PauseScore_boxplots.pdf"
-pdf(outfile, width=210/25.4, height=750/25.4, onefile=FALSE)
+# outfile = "art/2018-04-23/5prime_PauseScore_boxplots.CSD2_seqmagick.pdf"
+pdf(outfile, width=420/25.4, height=750/25.4, onefile=FALSE)
 ggarrange(
   plots=c(rbind(lapply(S, make_box), lapply(S, make_bar))),
   ncol=1, heights=rep(c(3,1), 5)

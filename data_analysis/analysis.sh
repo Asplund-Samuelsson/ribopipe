@@ -141,7 +141,6 @@ if [[ START_STEP -le S ]]
 
     # Run scripts
     $script_06
-    $script_06_b
 
     # Gzip big file
     pigz analysis/gene_PauseScore_profiles.tab
@@ -255,14 +254,16 @@ if [[ START_STEP -le S ]]
     # Report progress
     echo -e "\n\e[94mStep $S: Identifying high 5 prime PS genes...\e[0m\n"
 
-    # Run script
-    $script_11
+    # Run scripts
+    $script_11a
+    $script_11b
 
     # Plot the genes
     mkdir analysis/high_5prime_PS_genes
     mkdir analysis/high_5prime_PS_genes/spike
     mkdir analysis/high_5prime_PS_genes/close
     mkdir analysis/high_5prime_PS_genes/closer
+    mkdir analysis/high_5prime_PS_genes/significant
 
     cat analysis/high_5prime_PS_genes.txt | parallel --no-notice --jobs 7 \
     '/ssd/common/tools/ribopipe/plot_genes.R . {} operon -12 analysis/high_5prime_PS_genes/spike/{}.high_5prime_PS.spike.pdf'
@@ -272,6 +273,9 @@ if [[ START_STEP -le S ]]
 
     cat analysis/25nt_5prime_PS_ge10_genes.txt | parallel --no-notice --jobs 7 \
     '/ssd/common/tools/ribopipe/plot_genes.R . {} operon -12 analysis/high_5prime_PS_genes/closer/{}.25nt_5prime_PS_ge10.pdf'
+
+    cat analysis/significant_5prime_PS_genes.txt | parallel --no-notice --jobs 7 \
+    '/ssd/common/tools/ribopipe/plot_genes.R . {} operon -12 analysis/high_5prime_PS_genes/closer/{}.significant_5prime_PS.pdf'
 
     # Report step done
     echo -e "\n\e[92mStep $S: Done.\e[0m\n"
