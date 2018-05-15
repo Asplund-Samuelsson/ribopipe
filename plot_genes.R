@@ -43,6 +43,10 @@ outfile = args[5] # Output plot in PDF format
 # plot_type="operon"
 # shift=-12
 # outfile="/tmp/ribopipe_operon_batch"
+#
+# genes="slr0611"
+# shift=-12
+# outfile="/tmp/slr0611.pdf"
 
 ### FILENAMES, SAMPLE IDS AND STRAND IDS #######################################
 
@@ -195,11 +199,42 @@ plot_facets = function(genes){
   # Expand gene data to every position from start to end
   gdat_exp = expand.genes(gdat)
 
+  # If any gene contains negative positions, give special treatment
+  if(sum(gdat_exp$Position < 1)){
+
+    if(!exists("sequence_sizes")){
+      # Calculate size of sequences, if it wasn't done during shifting
+      sequence_sizes = aggregate(Position ~ Sequence, rpm, max)
+      colnames(sequence_sizes)[2] = "Size"
+    }
+
+    # Fold around beginning of circular genome
+    gdat_exp$FakePosition = gdat_exp$Position
+    gdat_exp = inner_join(gdat_exp, sequence_sizes)
+
+    gdat_exp$Position = ifelse(
+      gdat_exp$Position < 1,
+      gdat_exp$Position + gdat_exp$Size,
+      ifelse(
+        gdat_exp$Position > gdat_exp$Size,
+        gdat_exp$Position - gdat_exp$Size,
+        gdat_exp$Position
+        )
+      )
+
+    gdat_exp = gdat_exp[,
+      c("Sequence","Name","Position","Sample","strand", "FakePosition")
+    ]
+
+  } else {
+    gdat_exp$FakePosition = gdat_exp$Position
+  }
+
   # Merge with RPM data
-  grpm = inner_join(gdat_exp, subset(rpm, Position %in% unique(gdat_exp$Position)))
+  grpm = inner_join(gdat_exp, filter(rpm, Position %in% unique(gdat_exp$Position)))
 
   # Facilitate reversing order of positions in minus strand by multiplying with -1
-  grpm$Position = ifelse(grpm$strand == "-", grpm$Position * -1, grpm$Position)
+  grpm$Position = ifelse(grpm$strand == "-", grpm$FakePosition * -1, grpm$FakePosition)
 
   # Calculate minimum (=start) position per gene
   mins = aggregate(Position ~ Name, grpm, min)
