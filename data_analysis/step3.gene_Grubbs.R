@@ -4,6 +4,7 @@
 
 # Define input file
 infile="analysis/gene_RPKM.tab"
+# infile = "/hdd/common/proj/RibosomeProfiling/results/2018-04-16/CSD2_seqmagick/analysis/gene_RPKM.tab"
 
 ### LOAD DATA ##################################################################
 
@@ -66,7 +67,7 @@ t_data$sign[is.na(t_data$sign)] = "" # Add no significance to NA p-values
 
 # Add mean of four first time points and value of last time point
 early_RPKM = aggregate(RPKM ~ Name, subset(gen, Sample != "E"), mean)
-late_RPKM = gen_wide[,c("Name","E")]
+late_RPKM = subset(gen, Sample == "E")[,c("Name","RPKM")]
 colnames(late_RPKM)[2] = "RPKM_late"
 colnames(early_RPKM)[2] = "RPKM_early"
 

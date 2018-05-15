@@ -3,7 +3,7 @@
 # Universal options
 EXPERIMENT_NAME="ExperimentName"
 OUTDIR="YYYY.MM.DD.${EXPERIMENT_NAME}"
-START_STEP=1 # Auto-stop after step 5 unless skipped. Continue from step 6.
+START_STEP=1
 RIBODIR="/home/johannes/proj/ribo/tools/ribopipe"
 GENOME_FASTA="${RIBODIR}/reference_sequences/syn_PCC6803/NC_000911.1_chr_7plasmids.fasta"
 GENE_LIST="${RIBODIR}/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist_full.tab"

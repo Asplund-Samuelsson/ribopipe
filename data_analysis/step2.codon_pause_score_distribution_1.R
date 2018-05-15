@@ -6,6 +6,8 @@
 args = commandArgs(trailingOnly=T)
 codon_file = args[1]
 indir = "." # A ribopipe results directory
+# indir = "/hdd/common/proj/RibosomeProfiling/results/2018-04-16/CSD2_seqmagick"
+# codon_file = paste(c(indir, "/analysis/codon_seqpos.tab"), collapse="")
 
 # List RPM0 filenames
 rpm_files = list.files(
