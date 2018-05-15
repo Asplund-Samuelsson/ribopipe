@@ -297,10 +297,15 @@ if (tolower(plot_type) == "operon"){
   gene_ranges = unique(gdat[,c("Name", "Start", "End", "strand")])
 
   # Check the dominant direction of the genes
-  x_reverse = names(sort(table(gene_ranges$strand),decreasing=TRUE)[1]) == "-"
+  x_reverse = names(sort(
+      table(subset(gene_ranges, Name %in% gene_names)$strand),
+      decreasing=TRUE
+  )[1]) == "-"
 
   # If there is no dominant direction, set x_reverse to FALSE
-  no_dom_dir = length(unique(as.data.frame(table(gene_ranges$strand))$Freq)) == 1
+  no_dom_dir = length(unique(as.data.frame(
+    table(subset(gene_ranges, Name %in% gene_names)$strand)
+  )$Freq)) == 1
   if(no_dom_dir){
     x_reverse = FALSE
   }
