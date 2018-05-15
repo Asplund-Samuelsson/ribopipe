@@ -302,12 +302,39 @@ plot_operon = function(genes){
     }
   }
 
+  # Calculate size of the sequence
+  sequence_size = max(filter(rpm, Sequence == sequence)$Position)
+
+  # Calculate wanted genome positions
+  wanted_positions = (genes_full_range[1]):(genes_full_range[2])
+  wanted_positions = ifelse(
+    wanted_positions < 1,
+    wanted_positions + sequence_size,
+    ifelse(
+      wanted_positions > sequence_size,
+      wanted_positions - sequence_size,
+      wanted_positions
+    )
+  )
+
   # Extract all gene data for the specified range
   gdat = subset(gen,
-    ((Start >= genes_full_range[1] & Start <= genes_full_range[2]) |
-    (End >= genes_full_range[1] & End <= genes_full_range[2])) &
+    (Start %in% wanted_positions | End %in% wanted_positions) &
     Sequence == sequence
     )
+
+  # Translate end of sequence to negative values
+  starts_at_end = gdat$Start > genes_full_range[2]
+  gdat$Start = ifelse(
+    starts_at_end,
+    gdat$Start - sequence_size,
+    gdat$Start
+  )
+  gdat$End = ifelse(
+    starts_at_end,
+    gdat$End - sequence_size,
+    gdat$End
+  )
 
   # Create gene names list if using range input
   if(grepl(":", genes, fixed=T)){gene_names = unique(gdat$Name)}
@@ -319,22 +346,38 @@ plot_operon = function(genes){
   # Expand gene data and merge with whole range of RPM data
   if(nrow(gdat)){
     gdat_exp = expand.genes(gdat)
+    gdat_exp$Position = ifelse(
+      gdat_exp$Position < 1,
+      gdat_exp$Position + sequence_size,
+      ifelse(
+        gdat_exp$Position > sequence_size,
+        gdat_exp$Position - sequence_size,
+        gdat_exp$Position
+        )
+      )
     grpm = merge(
       gdat_exp,
-      subset(rpm,
-        Position >= genes_full_range[1] &
-        Position <= genes_full_range[2] &
+      filter(rpm,
+        Position %in% wanted_positions &
         Sequence == sequence
         ),
       all.y=T
       )
   }else{
-    grpm = subset(rpm,
-      Position >= genes_full_range[1] &
-      Position <= genes_full_range[2] &
+    grpm = filter(rpm,
+      Position %in% wanted_positions &
       Sequence == sequence
       )
   }
+
+  # Add fake position
+  grpm = inner_join(grpm, data.frame(
+    Position = wanted_positions,
+    FakePosition = (genes_full_range[1]):(genes_full_range[2])
+  ))
+
+  # Restore actual positions
+  grpm$Position = grpm$FakePosition
 
   # Create GRanges object
   gene_ranges = unique(gdat[,c("Name", "Start", "End", "strand")])
