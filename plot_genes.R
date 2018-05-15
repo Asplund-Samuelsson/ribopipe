@@ -38,6 +38,11 @@ outfile = args[5] # Output plot in PDF format
 # plot_type="operon"
 # shift=-12
 # outfile="/tmp/ribopipe_operon_plot.SGL_RS14355.pdf"
+#
+# genes="data/2018-05-15/plot_genes.test_batch.txt"
+# plot_type="operon"
+# shift=-12
+# outfile="/tmp/ribopipe_operon_batch"
 
 ### FILENAMES, SAMPLE IDS AND STRAND IDS #######################################
 
@@ -175,9 +180,9 @@ strandColors = c("#b35806", "#542788")
 names(strandColors) = c("+","-")
 colScale <- scale_fill_manual(name = "strand", values = strandColors)
 
-### PLOT DATA AS FACETS ########################################################
+### FACETS PLOTTING FUNCTION ###################################################
 
-if (tolower(plot_type) == "facets"){
+plot_facets = function(genes){
 
   message("Performing facets plotting...")
 
@@ -224,9 +229,9 @@ if (tolower(plot_type) == "facets"){
 
 }
 
-### PLOT GENOMIC RANGE (OPERON) ################################################
+### OPERON (GENOMIC RANGE) PLOTTING FUNCTION ###################################
 
-if (tolower(plot_type) == "operon"){
+plot_operon = function(genes){
 
   message("Performing operon plotting...")
 
@@ -268,6 +273,9 @@ if (tolower(plot_type) == "operon"){
     (End >= genes_full_range[1] & End <= genes_full_range[2])) &
     Sequence == sequence
     )
+
+  # Create gene names list if using range input
+  if(grepl(":", genes, fixed=T)){gene_names = unique(gdat$Name)}
 
   # Clip genes to range
   gdat$Start[gdat$Start <= genes_full_range[1]] = genes_full_range[1]
@@ -485,6 +493,36 @@ if (tolower(plot_type) == "operon"){
   }
   garbage = dev.off()
 
+}
+
+### PERFORM PLOTTING ###########################################################
+
+if (file.exists(genes)){
+  # If the "genes" variable is a batch file, plot data for each line
+  lines = scan(genes, character())
+} else {
+  # If the "genes" variable is a single line, plot data for only that
+  lines = genes
+}
+
+original_outfile = outfile
+
+# Perform the plotting
+for (genes in lines){
+  # Outfile is not complete if in batch mode
+  if (length(lines) > 1){
+    outfile = paste(
+      c(original_outfile, ".", gsub(",|:", "_", genes), ".pdf"), collapse=""
+    )
+  }
+  # Plot facets
+  if (tolower(plot_type) == "facets"){
+    plot_facets(genes)
+  }
+  # Plot operon
+  if (tolower(plot_type) == "operon"){
+    plot_operon(genes)
+  }
 }
 
 message("Done.")
