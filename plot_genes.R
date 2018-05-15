@@ -12,7 +12,7 @@ shift = as.numeric(args[4]) # Signal shift to apply to nucleotide RPM values
 outfile = args[5] # Output plot in PDF format
 
 # TESTING
-# indir="/hdd/common/proj/RibosomeProfiling/results/2018-03-26/CSD2_plasmid_test_2"
+# indir="/hdd/common/proj/RibosomeProfiling/results/2018-04-16/CSD2_seqmagick"
 #
 # genes="sll6098,slr1510,slr1511,sll1418"
 # plot_type="facets"
@@ -28,6 +28,16 @@ outfile = args[5] # Output plot in PDF format
 # plot_type="operon"
 # shift=-12
 # outfile="/tmp/ribopipe_operon_plot.plasmid.pdf"
+#
+# genes="SGL_RS06570"
+# plot_type="operon"
+# shift=-12
+# outfile="/tmp/ribopipe_operon_plot.SGL_RS06570.pdf"
+#
+# genes="SGL_RS14355"
+# plot_type="operon"
+# shift=-12
+# outfile="/tmp/ribopipe_operon_plot.SGL_RS14355.pdf"
 
 ### FILENAMES, SAMPLE IDS AND STRAND IDS #######################################
 
@@ -205,7 +215,10 @@ if (tolower(plot_type) == "facets"){
     breaks = seq(0, max(grpm$GenePosition), 200),
     minor_breaks = seq(0, max(grpm$GenePosition), 20)
     )
-  gp = gp + theme(axis.text.x = element_text(angle = 60, hjust=1, vjust=1))
+  gp = gp + theme(
+    axis.text.x = element_text(angle = 60, hjust=1, vjust=1),
+    strip.background = element_blank()
+  )
   gp = gp + colScale
   ggsave(outfile, gp, pdf, width=210/25.4, height=210/25.4)
 
@@ -388,9 +401,12 @@ if (tolower(plot_type) == "operon"){
     }
     gp = gp + colScale
     # Remove x axis decorations
-    gp = gp + theme(axis.title.x=element_blank(),
-                    axis.text.x=element_blank(),
-                    axis.ticks.x=element_blank())
+    gp = gp + theme(
+      axis.title.x = element_blank(),
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      strip.background = element_blank()
+    )
     return(gp)
   }
 
