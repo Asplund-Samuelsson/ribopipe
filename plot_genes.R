@@ -465,9 +465,9 @@ plot_operon = function(genes){
     }
     plot_data$Sample = factor(as.character(plot_data$Sample), levels=samples)
     gp = ggplot(plot_data, aes(x=Position, y=RPM, fill=strand))
-    if (0 %in% plot_data$Position){
+    if (1 %in% plot_data$Position){
       gp = gp + geom_vline(
-        xintercept=0, alpha=0.8,
+        xintercept=1, alpha=0.8,
         colour="red", linetype="dashed", size=0.2
       )
     }
