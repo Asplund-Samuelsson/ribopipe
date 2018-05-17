@@ -321,7 +321,7 @@ plot_operon = function(genes){
   gdat = subset(gen,
     (Start %in% wanted_positions | End %in% wanted_positions) &
     Sequence == sequence
-    )
+  )
 
   # Translate end of sequence to negative values
   starts_at_end = gdat$Start > genes_full_range[2]
@@ -333,6 +333,19 @@ plot_operon = function(genes){
   gdat$End = ifelse(
     starts_at_end,
     gdat$End - sequence_size,
+    gdat$End
+  )
+
+  # Translate beginning of sequence to positive values
+  ends_at_start = gdat$End < genes_full_range[1]
+  gdat$Start = ifelse(
+    ends_at_start,
+    gdat$Start + sequence_size,
+    gdat$Start
+  )
+  gdat$End = ifelse(
+    ends_at_start,
+    gdat$End + sequence_size,
     gdat$End
   )
 
@@ -452,6 +465,18 @@ plot_operon = function(genes){
     }
     plot_data$Sample = factor(as.character(plot_data$Sample), levels=samples)
     gp = ggplot(plot_data, aes(x=Position, y=RPM, fill=strand))
+    if (0 %in% plot_data$Position){
+      gp = gp + geom_vline(
+        xintercept=0, alpha=0.8,
+        colour="red", linetype="dashed", size=0.2
+      )
+    }
+    if ((sequence_size + 1) %in% plot_data$Position){
+      gp = gp + geom_vline(
+        xintercept=(sequence_size + 1), alpha=0.8,
+        colour="red", linetype="dashed", size=0.2
+      )
+    }
     if (S == "+"){
       gp = gp + geom_bar(position=position_dodge(), stat="identity")
     }else{

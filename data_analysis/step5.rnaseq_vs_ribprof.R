@@ -103,6 +103,9 @@ library(reshape2)
 gen$Name = gsub("'", '', gen$Name)
 gen_wide = dcast(gen[,c("Sample","Name","RPKM")], Name ~ Sample, value.var="RPKM")
 
+# Remove genes with no ribosome profiling data
+gen_wide = subset(gen_wide, !is.na(A) & !is.na(E))
+
 # Modify ggally_points function to add an abline
 points_abline = function(data, mapping, ...){
   p = ggplot(data = data, mapping = mapping) +
