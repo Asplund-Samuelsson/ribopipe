@@ -208,3 +208,15 @@ g <- ggpairs(
 )
 print(g)
 dev.off()
+
+# Plot all ribosome profiling samples versus eachother
+gen_wide = dcast(rib[,c("Sample","Name","RPKM")], Name ~ Sample, value.var="RPKM")
+
+# Plot all samples versus eachother
+png("analysis/ribo_all_vs_all_samples_and_genes.png", height = 800, width = 800)
+g <- ggpairs(
+  log(gen_wide[,2:ncol(gen_wide)]),
+  lower = list(continuous = wrap("points", alpha = 0.1, size=0.5), combo = wrap("dot", alpha = 0.4, size=2) )
+)
+print(g)
+dev.off()
