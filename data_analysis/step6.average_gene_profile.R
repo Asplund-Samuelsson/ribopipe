@@ -4,6 +4,7 @@
 
 # Define input directory
 indir="."
+genelist_file = args[1]
 # indir = "/hdd/common/proj/RibosomeProfiling/results/2018-04-16/CSD2_seqmagick"
 
 # List RPM0 filenames
@@ -81,6 +82,12 @@ colnames(gen)[1:5] = c("Sequence", "Name", "Start", "End", "Reads")
 # Create total count data frames with sample names
 tc_gen = data.frame(Sample = gen_tc_samples, TotalReads = gen_tc_data)
 
+# Load gene types
+gene_types = read.table(
+  genelist_file, stringsAsFactors=F, sep="\t", header=T, quote=""
+)[,c("Type","Old_locus_tag", "Sequence")]
+colnames(gene_types)[grep("Old", colnames(gene_types))] = "Name"
+
 ### SHIFT RPM VALUES ###########################################################
 
 # SIGNAL SHIFT
@@ -117,6 +124,9 @@ rpm = rpm_shift[,c("Sequence","Position","RPM","Sample","strand")]
 # Remove current read count
 gen = gen[,grep("(Sample)|(Reads)", colnames(gen), invert=T, perl=T)]
 gen = unique(gen)
+
+# Subset to coding sequences only
+gen = subset(gen, Name %in% subset(gene_types, Type == "CDS")$Name)
 
 # Expand each gene to all positions
 gen_allpos = as.data.frame(rbindlist(lapply(

@@ -141,6 +141,9 @@ rpm_shift$Position = ifelse(
 gen = gen[,grep("(Sample)|(Reads)", colnames(gen), invert=T, perl=T)]
 gen = unique(gen)
 
+# Subset to coding sequences only
+gen = subset(gen, Name %in% codons$Name)
+
 # Expand each gene to all positions
 gen_allpos = as.data.frame(rbindlist(lapply(
   gen$Name,

@@ -52,7 +52,7 @@ if [[ START_STEP -le S ]]
     echo -e "\n\e[94mStep $S: Codon PS distribution (1)...\e[0m\n"
 
     # Run script
-    $script_02 analysis/codon_seqpos.tab
+    $script_02 analysis/codon_seqpos.tab $GENE_LIST
 
     # Gzip big file
     pigz analysis/codon_PauseScore.tab
@@ -140,7 +140,7 @@ if [[ START_STEP -le S ]]
     echo -e "\n\e[94mStep $S: Calculating average gene profile...\e[0m\n"
 
     # Run scripts
-    $script_06
+    $script_06 $GENE_LIST
 
     # Gzip big file
     pigz analysis/gene_PauseScore_profiles.tab

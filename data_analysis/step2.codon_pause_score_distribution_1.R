@@ -5,6 +5,7 @@
 # Load command line arguments
 args = commandArgs(trailingOnly=T)
 codon_file = args[1]
+genelist_file = args[2]
 indir = "." # A ribopipe results directory
 # indir = "/hdd/common/proj/RibosomeProfiling/results/2018-04-16/CSD2_seqmagick"
 # codon_file = paste(c(indir, "/analysis/codon_seqpos.tab"), collapse="")
@@ -90,6 +91,12 @@ colnames(gen)[1:5] = c("Sequence", "Name", "Start", "End", "Reads")
 # Create total count data frames with sample names
 tc_gen = data.frame(Sample = gen_tc_samples, TotalReads = gen_tc_data)
 
+# Load gene types
+gene_types = read.table(
+  genelist_file, stringsAsFactors=F, sep="\t", header=T, quote=""
+)[,c("Type","Old_locus_tag", "Sequence")]
+colnames(gene_types)[grep("Old", colnames(gene_types))] = "Name"
+
 ### SHIFT RPM VALUES ###########################################################
 
 # SIGNAL SHIFT
@@ -130,6 +137,9 @@ rpm_shift$Position = ifelse(
 # Remove current read count
 gen = gen[,grep("(Sample)|(Reads)", colnames(gen), invert=T, perl=T)]
 gen = unique(gen)
+
+# Subset to coding sequences only
+gen = subset(gen, Name %in% subset(gene_types, Type == "CDS")$Name)
 
 # Expand each gene to all positions
 gen_allpos = as.data.frame(rbindlist(lapply(

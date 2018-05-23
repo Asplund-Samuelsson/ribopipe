@@ -2,9 +2,6 @@
 
 ### FILENAMES, SAMPLE IDS AND STRAND IDS #######################################
 
-# Define input directory
-indir="."
-
 # Define input file
 codon_file="analysis/codon_PauseScore.tab.gz"
 
