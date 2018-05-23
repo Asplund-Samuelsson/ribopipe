@@ -82,7 +82,10 @@ gp = gp + facet_grid(Sample ~ .)
 gp = gp + scale_colour_manual(values=colours)
 gp = gp + scale_y_continuous(trans="asinh", breaks=custom_breaks, labels=custom_breaks)
 #gp = gp + scale_y_sqrt()
-gp = gp + theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust = 1, size=7))
+gp = gp + theme(
+  axis.text.x = element_text(angle = 90, vjust=0.5, hjust = 1, size=7),
+  strip.background = element_blank()
+)
 
 ggsave(
   "analysis/codon_pause_score_boxplot.pdf",

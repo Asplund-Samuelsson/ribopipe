@@ -366,6 +366,9 @@ gp = gp + theme_bw()
 gp = gp + scale_x_continuous(breaks=-50:50)
 gp = gp + facet_grid(Sample ~ Codon + AminoAcid)
 gp = gp + scale_colour_manual(values=colours)
-gp = gp + theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust = 1, size=7))
+gp = gp + theme(
+  axis.text.x = element_text(angle = 90, vjust=0.5, hjust = 1, size=7),
+  strip.background = element_blank()
+)
 
 ggsave("analysis/pause_score_distribution.codon_median.all_shifts.pdf", gp, width=14000/25.4, height=180/25.4, limitsize=F)

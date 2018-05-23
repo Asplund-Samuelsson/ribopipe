@@ -394,5 +394,6 @@ gp = gp + scale_colour_manual(values=c("#1b7837","#5aae61","#a6dba0","#d9f0d3","
 gp = gp + facet_grid(Variable ~ Part, scales="free")
 gp = gp + scale_y_log10()
 gp = gp + scale_x_continuous(minor_breaks=seq(-174, 168, 3))
+gp = gp + theme(strip.background = element_blank())
 # ggsave("art/2018-04-23/average_gene_profile.means_and_medians.CSD2_seqmagick.b3.pdf", gp, height=180/25.4, width=320/25.4)
 ggsave("analysis/average_gene_profile.means_and_medians.pdf", gp, height=180/25.4, width=320/25.4)

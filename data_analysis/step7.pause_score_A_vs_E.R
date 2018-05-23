@@ -90,7 +90,10 @@ gp = gp + geom_point()
 gp = gp + theme_bw()
 gp = gp + facet_grid(Sample ~ .)
 gp = gp + scale_colour_manual(values=colours)
-gp = gp + theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust = 1, size=7))
+gp = gp + theme(
+  axis.text.x = element_text(angle = 90, vjust=0.5, hjust = 1, size=7),
+  strip.background = element_blank()
+)
 
 ggsave(
   "analysis/pause_score_distribution.codon_medians.pdf",

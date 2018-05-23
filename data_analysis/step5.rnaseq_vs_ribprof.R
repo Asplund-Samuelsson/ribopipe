@@ -189,6 +189,9 @@ gp = gp + scale_x_log10()
 gp = gp + scale_y_log10()
 gp = gp + annotation_logticks(sides="bl")
 gp = gp + scale_colour_manual(values=c("#1b7837","#762a83"))
+gp = gp + theme(
+  strip.background = element_blank()
+)
 
 ggsave(
   "analysis/rnaseq_vs_ribprof.TE_vs_RNAseq.pdf",
