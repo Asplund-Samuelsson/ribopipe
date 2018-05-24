@@ -265,17 +265,21 @@ if [[ START_STEP -le S ]]
     mkdir analysis/high_5prime_PS_genes/closer
     mkdir analysis/high_5prime_PS_genes/significant
 
-    cat analysis/high_5prime_PS_genes.txt | parallel --no-notice --jobs 7 \
-    '/ssd/common/tools/ribopipe/plot_genes.R . {} operon -12 analysis/high_5prime_PS_genes/spike/{}.high_5prime_PS.spike.pdf'
+    /ssd/common/tools/ribopipe/plot_genes.R . \
+    analysis/high_5prime_PS_genes.txt operon -12 \
+    analysis/high_5prime_PS_genes/spike/high_5prime_PS.spike > /dev/null &
 
-    cat analysis/similar_5prime_PS_genes.txt | parallel --no-notice --jobs 7 \
-    '/ssd/common/tools/ribopipe/plot_genes.R . {} operon -12 analysis/high_5prime_PS_genes/close/{}.similar_5prime_PS.pdf'
+    /ssd/common/tools/ribopipe/plot_genes.R . \
+    analysis/similar_5prime_PS_genes.txt operon -12 \
+    analysis/high_5prime_PS_genes/close/similar_5prime_PS > /dev/null &
 
-    cat analysis/25nt_5prime_PS_ge10_genes.txt | parallel --no-notice --jobs 7 \
-    '/ssd/common/tools/ribopipe/plot_genes.R . {} operon -12 analysis/high_5prime_PS_genes/closer/{}.25nt_5prime_PS_ge10.pdf'
+    /ssd/common/tools/ribopipe/plot_genes.R . \
+    analysis/25nt_5prime_PS_ge10_genes.txt operon -12 \
+    analysis/high_5prime_PS_genes/closer/25nt_5prime_PS_ge10 > /dev/null &
 
-    cat analysis/significant_5prime_PS_genes.txt | parallel --no-notice --jobs 7 \
-    '/ssd/common/tools/ribopipe/plot_genes.R . {} operon -12 analysis/high_5prime_PS_genes/significant/{}.significant_5prime_PS.pdf'
+    /ssd/common/tools/ribopipe/plot_genes.R . \
+    analysis/significant_5prime_PS_genes.txt operon -12 \
+    analysis/high_5prime_PS_genes/significant/significant_5prime_PS > /dev/null &
 
     # Report step done
     echo -e "\n\e[92mStep $S: Done.\e[0m\n"
