@@ -41,6 +41,7 @@ gp = gp + geom_bar(position="dodge")
 gp = gp + facet_grid(Group~Nucleotide, scales="free_y")
 gp = gp + theme_bw()
 gp = gp + scale_fill_manual(values=c("#80cdc1","#9970ab","#dfc27d","#2166ac"))
+gp = gp + theme(strip.background = element_blank())
 
 ggsave(
   "analysis/5prime_UTRs_nucleotide_count.pdf", gp,
