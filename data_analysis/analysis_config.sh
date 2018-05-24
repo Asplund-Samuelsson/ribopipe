@@ -7,6 +7,8 @@ START_STEP=1
 RIBODIR="/home/johannes/proj/ribo/tools/ribopipe"
 GENOME_FASTA="${RIBODIR}/reference_sequences/syn_PCC6803/NC_000911.1_chr_7plasmids.fasta"
 GENE_LIST="${RIBODIR}/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist_full.tab"
+ANNOTATION_FILE="${RIBODIR}/genelists/syn_PCC6803/20180315_all_annotations_Micha.csv"
+rnadir="/hdd/common/proj/RNAseq/results/2018-03-29/CO2_lim_with_plasmids"
 
 # Step-specific options
 
@@ -24,7 +26,6 @@ script_04="${RIBODIR}/data_analysis/step4.stop_Grubbs.R"
 
 # Step 5: RNAseq vs RP
 script_05="${RIBODIR}/data_analysis/step5.rnaseq_vs_ribprof.R"
-rnadir="/hdd/common/proj/RNAseq/results/2018-03-29/CO2_lim_with_plasmids"
 
 # Step 6: Average gene profile
 script_06="${RIBODIR}/data_analysis/step6.average_gene_profile.R"
@@ -50,3 +51,17 @@ script_12="${RIBODIR}/data_analysis/step12.average_gene_profile_5prime_boxplots.
 
 # Step 13: All shifts codon medians
 script_13="${RIBODIR}/data_analysis/step13.codon_pause_score_distribution_3.R"
+
+# Step 14: Extract and align 5' UTRs
+script_14a="${RIBODIR}/data_analysis/step14a.5prime_UTR_positions.R"
+script_14b="${RIBODIR}/data_analysis/step14b.5prime_UTR_extraction.py"
+script_14c="${RIBODIR}/data_analysis/step14c.5prime_UTRs_nucleotide_count.R"
+
+# Step 15: Plot RPKM per process
+script_15="${RIBODIR}/data_analysis/step15.RPKM_per_process.R"
+
+# Step 16: Create translational efficiency table
+script_16="${RIBODIR}/data_analysis/step16.create_TE_table.R"
+
+# Step 17: Save CDS RPKM table without filtering
+script_17="${RIBODIR}/data_analysis/step17.all_genes_RPKM_no_filter.R"

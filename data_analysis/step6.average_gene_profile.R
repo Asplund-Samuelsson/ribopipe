@@ -4,6 +4,7 @@
 
 # Define input directory
 indir="."
+args = commandArgs(trailingOnly=T)
 genelist_file = args[1]
 # indir = "/hdd/common/proj/RibosomeProfiling/results/2018-04-16/CSD2_seqmagick"
 

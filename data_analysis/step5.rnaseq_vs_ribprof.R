@@ -89,7 +89,7 @@ gen = subset(gen, !(Sample %in% c("B","C","D")))
 # Filter out low read count genes
 # 3729 genes before
 genes_below_threshold = unique(as.character(
-  subset(gen, Reads <= 32 & !(Sample %in% c("A","E")))$Name
+  subset(gen, Reads < 32 & !(Sample %in% c("A","E")))$Name
   ))
 gen = subset(gen, !(Name %in% genes_below_threshold))
 # 2582 genes after
