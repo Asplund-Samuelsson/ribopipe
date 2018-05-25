@@ -7,7 +7,8 @@ args = commandArgs(trailingOnly=T)
 genelist_file = args[1]
 annotation_file = args[2]
 indir = "." # A ribopipe results directory
-# annotation_file = "data/2018-05-03/20180315_all_annotations_Micha.csv"
+# genelist_file = "/home/johannes/proj/ribo/tools/ribopipe/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist_full.tab"
+# annotation_file = "/home/johannes/proj/ribo/tools/ribopipe/genelists/syn_PCC6803/20180315_all_annotations_Micha.csv"
 
 # List RPM0 filenames
 rpm_files = list.files(
@@ -240,15 +241,21 @@ ggsave(
 )
 
 # Add information about 5' UTR
-significant_file = "analysis/significant_5prime_PS_genes.txt"
-significant_genes = scan(significant_file, character())
+significant_file = "analysis/high_5prime_PS_test.tab"
 
-gen$UTR = ifelse(
-  gen$Name %in% significant_genes, "High PS 5' UTR", "Other 5' UTR"
+average_5prime_PS = read.table(
+  significant_file, header=T, sep="\t",stringsAsFactors=F
 )
 
+average_5prime_PS = mutate(
+  average_5prime_PS,
+  UTR = ifelse(PauseScore > PS_0.05, "High PS 5' UTR", "Other 5' UTR")
+)
+
+gen_utr = inner_join(gen, average_5prime_PS[,c("Name","Sample","UTR")])
+
 # Sum per process
-gen_sum = aggregate(RPKM ~ Sample + Process + UTR, gen, sum)
+gen_sum = aggregate(RPKM ~ Sample + Process + UTR, gen_utr, sum)
 gen_sum$Sample = factor(gen_sum$Sample, levels = rev(c("A","B","C","D","E")))
 
 gen_sum$Process = factor(
