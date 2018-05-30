@@ -9,7 +9,8 @@ indir = args[1] # A ribopipe results directory
 genes = args[2] # Gene name(s); slr1834,sll1234, or interval; ref_seq:8001:9001
 plot_type = args[3] # Plot "facets" or "operon"
 shift = as.numeric(args[4]) # Signal shift to apply to nucleotide RPM values
-outfile = args[5] # Output plot in PDF format
+cutoff = as.numeric(args[5]) # RPM cutoff
+outfile = args[6] # Output plot in PDF format
 
 # TESTING
 # indir="/hdd/common/proj/RibosomeProfiling/results/2018-04-16/CSD2_seqmagick"
@@ -457,6 +458,13 @@ plot_operon = function(genes){
   plot_RPM = function(S, reverse_facets){
     # Subset to selected strand
     plot_data = subset(grpm, strand == S)
+    # Apply RPM cutoff
+    if (cutoff) {
+      plot_data$Cut = ifelse(plot_data$RPM > cutoff, 1, 0)
+    }else{
+      plot_data$Cut = 0
+    }
+    plot_data$RPM = ifelse(plot_data$Cut == 1, cutoff, plot_data$RPM)
     # Reorder samples if the facet order should be reversed
     samples = unique(as.character(plot_data$Sample))
     samples = samples[order(samples)]
@@ -477,10 +485,13 @@ plot_operon = function(genes){
         colour="red", linetype="dashed", size=0.2
       )
     }
-    if (S == "+"){
-      gp = gp + geom_bar(position=position_dodge(), stat="identity")
-    }else{
-      gp = gp + geom_bar(position=position_dodge(), stat="identity")
+    gp = gp + geom_bar(position=position_dodge(), stat="identity")
+    if (nrow(filter(plot_data, Cut == 1))){
+      gp = gp + geom_bar(
+        mapping=aes(x=Position, y=RPM, group=strand),
+        data=filter(plot_data, Cut == 1), fill="red",
+        stat="identity"
+      )
     }
     if(exists("gr")){
       # If there is a GenomicRanges object, add vlines indicating gene bounds
@@ -509,7 +520,11 @@ plot_operon = function(genes){
         )
     }
     # Set up y axis
-    y_axis_limits = c(0, max(grpm$RPM)*1.05)
+    if (cutoff){
+      y_axis_limits = c(0, cutoff)
+    }else{
+      y_axis_limits = c(0, max(grpm$RPM)*1.05)
+    }
     if((!x_reverse & S == "-") | (x_reverse & S == "+")){
       gp = gp + scale_y_reverse(limits=rev(y_axis_limits))
     }else{
