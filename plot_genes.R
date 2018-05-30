@@ -583,16 +583,30 @@ plot_operon = function(genes){
     gp_genes = gp
   }
 
+  # Calculate plot heights
+  N = length(unique(as.character(grpm$Sample)))
+
+  h_sample = 22.05
+  h_spacer = 1.93
+  h_middle = 15
+
+  h_upper = N * (h_sample + h_spacer) + h_spacer
+  h_lower = h_upper
+
+  h_full = (h_upper + h_middle + h_lower)/25.4
+
+  h_dist = c(h_upper, h_middle, h_lower)
+
   # Align plots
-  pdf(outfile, width=210/25.4, height=270/25.4, onefile=FALSE)
+  pdf(outfile, width=210/25.4, height=h_full, onefile=FALSE)
   if(!no_dom_dir & x_reverse){
     gp_rpm_p = plot_RPM("+", reverse_facets=T)
     gp_rpm_m = plot_RPM("-", reverse_facets=F)
-    ggarrange(gp_rpm_m, gp_genes, gp_rpm_p, ncol=1, heights=c(20,2,20))
+    ggarrange(gp_rpm_m, gp_genes, gp_rpm_p, ncol=1, heights=h_dist)
   }else{
     gp_rpm_p = plot_RPM("+", reverse_facets=F)
     gp_rpm_m = plot_RPM("-", reverse_facets=T)
-    ggarrange(gp_rpm_p, gp_genes, gp_rpm_m, ncol=1, heights=c(20,2,20))
+    ggarrange(gp_rpm_p, gp_genes, gp_rpm_m, ncol=1, heights=h_dist)
   }
   garbage = dev.off()
 
