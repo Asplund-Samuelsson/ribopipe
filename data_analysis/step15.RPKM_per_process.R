@@ -278,5 +278,5 @@ gp = gp + guides(colour = guide_legend(reverse = T))
 
 ggsave(
   "analysis/RPKM_per_process_points_by_UTR.pdf", gp,
-  width = 280/25.4, height = 85/25.4
+  width = 240/25.4, height = 85/25.4
 )

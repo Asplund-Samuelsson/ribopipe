@@ -360,6 +360,9 @@ write.table(
   quote=F, sep="\t", row.names=F, col.names=T
   )
 
+# Remove gene that skews 5' UTR
+gene_profiles = filter(gene_profiles, Name != "slr1474")
+
 # Subset for 5 and 3 prime ends
 gene_prof_5prime = filter(gene_profiles, RelPos %in% -50:150)
 gene_prof_3prime = filter(gene_profiles, RelPosFromEnd %in% -150:50)
@@ -399,7 +402,7 @@ average_profiles$Part = factor(average_profiles$Part, levels = c("5_prime","3_pr
 
 # Mean or median lines of all genes, by part of ORF, coloured by sample
 gp = ggplot(average_profiles, aes(x=RelPos, y=PauseScore, colour=Sample))
-gp = gp + geom_line(alpha=0.5)
+gp = gp + geom_line(alpha=0.5, size=0.4)
 gp = gp + theme_bw()
 gp = gp + scale_colour_manual(values=c("#1b7837","#5aae61","#a6dba0","#d9f0d3","#762a83"))
 gp = gp + facet_grid(Variable ~ Part, scales="free")
@@ -407,4 +410,4 @@ gp = gp + scale_y_log10()
 gp = gp + scale_x_continuous(minor_breaks=seq(-174, 168, 3))
 gp = gp + theme(strip.background = element_blank())
 # ggsave("art/2018-04-23/average_gene_profile.means_and_medians.CSD2_seqmagick.b3.pdf", gp, height=180/25.4, width=320/25.4)
-ggsave("analysis/average_gene_profile.means_and_medians.pdf", gp, height=180/25.4, width=320/25.4)
+ggsave("analysis/average_gene_profile.means_and_medians.pdf", gp, height=6.875*0.5, width=6.875)
