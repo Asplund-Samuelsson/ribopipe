@@ -1,116 +1,150 @@
 #!/usr/bin/env Rscript
 
-
 ### COMMAND LINE ARGUMENTS #####################################################
 
-# Load command line arguments
-args = commandArgs(trailingOnly=T)
-indir = args[1] # A ribopipe results directory
-genes = args[2] # Gene name(s); slr1834,sll1234, or interval; ref_seq:8001:9001
-plot_type = args[3] # Plot "facets" or "operon"
-shift = as.numeric(args[4]) # Signal shift to apply to nucleotide RPM values
-cutoff = as.numeric(args[5]) # RPM cutoff
-outfile = args[6] # Output plot in PDF format
+library(optparse)
 
-# TESTING
+# Parse command line arguments
+option_list = list(
+  make_option(
+    c("-i", "--indir"), type="character", default="",
+    help="Input ribopipe/rnapipe results directory."
+  ),
+  make_option(
+    c("-r", "--rpm"), type="character", default="",
+    help="Input RPM (or other y axis value) table."
+  ),
+  make_option(
+    c("-G", "--gen"), type="character", default="",
+    help="Input gene list."
+  ),
+  make_option(
+    c("-g", "--genes"), type="character", default="",
+    help="Genes/interval to plot; e.g. 'slr1834,sll1234' or 'ref_seq:8001:9001' or batch file."
+  ),
+  make_option(
+    c("-F", "--facets"), action="store_true", default=F,
+    help="Plot genes as facets."
+  ),
+  make_option(
+    c("-O", "--operon"), action="store_true", default=F,
+    help="Plot genes as operon."
+  ),
+  make_option(
+    c("-s", "--shift"), type="integer", default=0,
+    help="Signal position shift to apply to nucleotide RPM values (default: 0)."
+  ),
+  make_option(
+    c("-c", "--cutoff"), type="double", default=0,
+    help="RPM (or other y axis value) cutoff. Values above replaced by red bars (default: no cutoff)."
+  ),
+  make_option(
+    c("-o", "--outfile"), type="character", default="plot_genes.outfile.pdf",
+    help="Output PDF file."
+  )
+)
+
+opt_parser = OptionParser(option_list=option_list)
+opt = parse_args(opt_parser)
+
+indir = opt$indir
+rpm_file = opt$rpm
+gen_file = opt$gen
+genes = opt$genes
+if (opt$facets & opt$operon) {
+  stop("Choose only one plot type.")
+}
+if (opt$facets) {plot_type = "facets"}
+if (opt$operon) {plot_type = "operon"}
+shift = opt$shift
+cutoff = opt$cutoff
+outfile = opt$outfile
+
+# # TESTING
 # indir="/hdd/common/proj/RibosomeProfiling/results/2018-04-16/CSD2_seqmagick"
 #
-# genes="sll6098,slr1510,slr1511,sll1418"
-# plot_type="facets"
-# shift=-12
-# outfile="/tmp/ribopipe_facets_plot.pdf"
-#
+# # Test 1
 # genes="slr1510,slr1511,sll1418"
 # plot_type="operon"
 # shift=-12
-# outfile="/tmp/ribopipe_operon_plot.chromosome.pdf"
-#
-# genes="NC_005230.1:82000:87000"
-# plot_type="operon"
-# shift=-12
-# outfile="/tmp/ribopipe_operon_plot.plasmid.pdf"
-#
-# genes="SGL_RS06570"
-# plot_type="operon"
-# shift=-12
-# outfile="/tmp/ribopipe_operon_plot.SGL_RS06570.pdf"
-#
-# genes="SGL_RS14355"
-# plot_type="operon"
-# shift=-12
-# outfile="/tmp/ribopipe_operon_plot.SGL_RS14355.pdf"
-#
-# genes="data/2018-05-15/plot_genes.test_batch.txt"
-# plot_type="operon"
-# shift=-12
-# outfile="/tmp/ribopipe_operon_batch"
-#
-# genes="slr0611"
-# shift=-12
-# outfile="/tmp/slr0611.pdf"
-
-### FILENAMES, SAMPLE IDS AND STRAND IDS #######################################
-
-message("Loading data...")
-
-# List RPM0 filenames
-rpm_files = list.files(
-  path=paste(c(indir, "/RPM"), collapse=""), pattern="\\.RPM0\\.", full.names=T
-  )
-
-# List readsPerGene filenames
-gene_files = list.files(
-  path=paste(c(indir, "/readsPerGene"), collapse=""),
-  pattern="\\.readsPerGene\\.",
-  full.names=T
-  )
-
-# Obtain sample and strand IDs for RPM0 files in order
-rpm_samples = unlist(
-  lapply(lapply(strsplit(rpm_files, "\\."), tail, n=3L), head, n=1L)
-  )
-rpm_strands = ifelse(
-  unlist(lapply(strsplit(rpm_files, "\\."), tail, n=1L)) == "p",
-  "+",
-  "-"
-  )
-
-# Obtain sample and strand IDs for readsPerGene files in order
-gene_samples = unlist(
-  lapply(lapply(strsplit(gene_files, "\\."), tail, n=3L), head, n=1L)
-  )
-gene_strands = ifelse(
-  unlist(lapply(strsplit(gene_files, "\\."), tail, n=1L)) == "p",
-  "+",
-  "-"
-  )
+# cutoff=0
+# outfile="/tmp/ribopipe_operon_plot.pdf"
 
 ### LOAD DATA ##################################################################
+
+message("Loading data...")
 
 # Use data.table library for faster loading
 suppressMessages(library(data.table))
 
-# Load the files
-rpm_data = lapply(rpm_files, fread, header=F)
-gene_data = lapply(gene_files, fread, header=F)
+if (dir.exists(indir)){
 
-# Add columns with sample and strand IDs to each dataframe
-for( i in seq_along(rpm_data)){
-  rpm_data[[i]] = cbind(as.data.frame(rpm_data[[i]]), Sample=rpm_samples[i])
-  rpm_data[[i]] = cbind(as.data.frame(rpm_data[[i]]), strand=rpm_strands[i])
+  # List RPM0 filenames
+  rpm_files = list.files(
+    path=paste(c(indir, "/RPM"), collapse=""), pattern="\\.RPM0\\.", full.names=T
+    )
+
+  # List readsPerGene filenames
+  gene_files = list.files(
+    path=paste(c(indir, "/readsPerGene"), collapse=""),
+    pattern="\\.readsPerGene\\.",
+    full.names=T
+    )
+
+  # Obtain sample and strand IDs for RPM0 files in order
+  rpm_samples = unlist(
+    lapply(lapply(strsplit(rpm_files, "\\."), tail, n=3L), head, n=1L)
+    )
+  rpm_strands = ifelse(
+    unlist(lapply(strsplit(rpm_files, "\\."), tail, n=1L)) == "p",
+    "+",
+    "-"
+    )
+
+  # Obtain sample and strand IDs for readsPerGene files in order
+  gene_samples = unlist(
+    lapply(lapply(strsplit(gene_files, "\\."), tail, n=3L), head, n=1L)
+    )
+  gene_strands = ifelse(
+    unlist(lapply(strsplit(gene_files, "\\."), tail, n=1L)) == "p",
+    "+",
+    "-"
+    )
+
+  # Load the files
+  rpm_data = lapply(rpm_files, fread, header=F)
+  gene_data = lapply(gene_files, fread, header=F)
+
+  # Add columns with sample and strand IDs to each dataframe
+  for( i in seq_along(rpm_data)){
+    rpm_data[[i]] = cbind(as.data.frame(rpm_data[[i]]), Sample=rpm_samples[i])
+    rpm_data[[i]] = cbind(as.data.frame(rpm_data[[i]]), strand=rpm_strands[i])
+  }
+  for( i in seq_along(gene_data)){
+    gene_data[[i]] = cbind(as.data.frame(gene_data[[i]]), Sample=gene_samples[i])
+    gene_data[[i]] = cbind(as.data.frame(gene_data[[i]]), strand=gene_strands[i])
+  }
+
+  # Create one dataframe for RPM data
+  rpm = as.data.frame(rbindlist(rpm_data))
+  colnames(rpm)[1:3] = c("Sequence", "Position", "RPM")
+
+  # Create one dataframe for gene data
+  gen = as.data.frame(rbindlist(gene_data))
+  colnames(gen)[1:5] = c("Sequence", "Name", "Start", "End", "Reads")
+
+} else {
+  if (file.exists(rpm_file) & file.exists(gen_file)) {
+    rpm = as.data.frame(fread(rpm_file, header=T, stringsAsFactors=F, sep="\t"))
+    gen = read.table(gen_file, header=T, stringsAsFactors=F, sep="\t")
+    # Add Sample column to gen if missing
+    if (!("Sample" %in% colnames(gen))) {
+      gen = merge(gen, data.frame(Sample = unique(rpm$Sample)))
+    }
+  } else {
+    stop("Please provide input data directory or files.")
+  }
 }
-for( i in seq_along(gene_data)){
-  gene_data[[i]] = cbind(as.data.frame(gene_data[[i]]), Sample=gene_samples[i])
-  gene_data[[i]] = cbind(as.data.frame(gene_data[[i]]), strand=gene_strands[i])
-}
-
-# Create one dataframe for RPM data
-rpm = as.data.frame(rbindlist(rpm_data))
-colnames(rpm)[1:3] = c("Sequence", "Position", "RPM")
-
-# Create one dataframe for gene data
-gen = as.data.frame(rbindlist(gene_data))
-colnames(gen)[1:5] = c("Sequence", "Name", "Start", "End", "Reads")
 
 ### SHIFT RPM VALUES ###########################################################
 
