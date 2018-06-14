@@ -43,6 +43,10 @@ option_list = list(
     help="RPM (or other y axis value) cutoff. Values above replaced by red bars (default: no cutoff)."
   ),
   make_option(
+    c("-p", "--pausescore"), action="store_true", default=F,
+    help="Plot pause score instead of RPM."
+  ),
+  make_option(
     c("-o", "--outfile"), type="character", default="plot_genes.outfile.pdf",
     help="Output PDF file."
   )
@@ -64,6 +68,7 @@ shift = opt$shift
 cutoff = opt$cutoff
 samples_to_plot = opt$samples
 outfile = opt$outfile
+plot_ps = opt$pausescore
 
 # # TESTING
 # indir="/hdd/common/proj/RibosomeProfiling/results/2018-04-16/CSD2_seqmagick"
@@ -293,7 +298,17 @@ plot_facets = function(genes){
   # Make Name factor for preserving user-specified order
   grpm$Name = factor(as.character(grpm$Name), levels=gene_names)
 
-  gp = ggplot(grpm, aes(x=GenePosition, y=RPM, fill=strand))
+  if (plot_ps) {
+    grpm = inner_join(
+      grpm,
+      grpm %>% group_by(Name, Sample) %>% summarise(meanRPM = mean(RPM)) %>%
+      as.data.frame()
+    )
+    grpm$PS = grpm$RPM / grpm$meanRPM
+    gp = ggplot(grpm, aes(x=GenePosition, y=PS, fill=strand))
+  } else {
+    gp = ggplot(grpm, aes(x=GenePosition, y=RPM, fill=strand))
+  }
   gp = gp + geom_bar(position=position_dodge(), stat="identity")
   gp = gp + theme_bw()
   gp = gp + facet_grid(Sample~Name, scales="free_x", space="free_x")
@@ -438,6 +453,17 @@ plot_operon = function(genes){
   # Restore actual positions
   grpm$Position = grpm$FakePosition
 
+  # If using pausescore, calculate it
+  if (plot_ps & genes %in% grpm$Name){
+    grpm = inner_join(
+      grpm,
+      grpm %>% filter(Name == genes) %>%
+      group_by(Sample) %>% dplyr::summarise(meanRPM = mean(RPM)) %>%
+      as.data.frame()
+    )
+    grpm$PS = grpm$RPM / grpm$meanRPM
+  }
+
   # Create GRanges object
   gene_ranges = unique(gdat[,c("Name", "Start", "End", "strand")])
 
@@ -503,13 +529,22 @@ plot_operon = function(genes){
   plot_RPM = function(S, reverse_facets){
     # Subset to selected strand
     plot_data = subset(grpm, strand == S)
-    # Apply RPM cutoff
+    # Apply cutoff
     if (cutoff) {
-      plot_data$Cut = ifelse(plot_data$RPM > cutoff, 1, 0)
+      if (!plot_ps){
+        plot_data$Cut = ifelse(plot_data$RPM > cutoff, 1, 0)
+      }else{
+        plot_data$Cut = ifelse(plot_data$PS > cutoff, 1, 0)
+      }
     }else{
       plot_data$Cut = 0
     }
-    plot_data$RPM = ifelse(plot_data$Cut == 1, cutoff, plot_data$RPM)
+
+    if (!plot_ps) {
+      plot_data$RPM = ifelse(plot_data$Cut == 1, cutoff, plot_data$RPM)
+    }else{
+      plot_data$PS = ifelse(plot_data$Cut == 1, cutoff, plot_data$PS)
+    }
     # Reorder samples if the facet order should be reversed
     samples = unique(as.character(plot_data$Sample))
     samples = samples[order(samples)]
@@ -517,7 +552,11 @@ plot_operon = function(genes){
       samples = samples[order(samples, decreasing=T)]
     }
     plot_data$Sample = factor(as.character(plot_data$Sample), levels=samples)
-    gp = ggplot(plot_data, aes(x=Position, y=RPM, fill=strand))
+    if (!plot_ps){
+      gp = ggplot(plot_data, aes(x=Position, y=RPM, fill=strand))
+    }else{
+      gp = ggplot(plot_data, aes(x=Position, y=PS, fill=strand))
+    }
     if (1 %in% plot_data$Position){
       gp = gp + geom_vline(
         xintercept=1, alpha=0.8,
@@ -532,11 +571,19 @@ plot_operon = function(genes){
     }
     gp = gp + geom_bar(position=position_dodge(), stat="identity")
     if (nrow(filter(plot_data, Cut == 1))){
-      gp = gp + geom_bar(
-        mapping=aes(x=Position, y=RPM, group=strand),
-        data=filter(plot_data, Cut == 1), fill="red",
-        stat="identity"
-      )
+      if (!plot_ps){
+        gp = gp + geom_bar(
+          mapping=aes(x=Position, y=RPM, group=strand),
+          data=filter(plot_data, Cut == 1), fill="red",
+          stat="identity"
+        )
+      }else{
+        gp = gp + geom_bar(
+          mapping=aes(x=Position, y=PS, group=strand),
+          data=filter(plot_data, Cut == 1), fill="red",
+          stat="identity"
+        )
+      }
     }
     if(exists("gr")){
       # If there is a GenomicRanges object, add vlines indicating gene bounds
@@ -568,7 +615,11 @@ plot_operon = function(genes){
     if (cutoff){
       y_axis_limits = c(0, cutoff)
     }else{
-      y_axis_limits = c(0, max(grpm$RPM)*1.05)
+      if (!plot_ps) {
+        y_axis_limits = c(0, max(grpm$RPM)*1.05)
+      }else{
+        y_axis_limits = c(0, max(grpm$PS)*1.05)
+      }
     }
     if((!x_reverse & S == "-") | (x_reverse & S == "+")){
       gp = gp + scale_y_reverse(limits=rev(y_axis_limits))
