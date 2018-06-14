@@ -23,6 +23,10 @@ option_list = list(
     help="Genes/interval to plot; e.g. 'slr1834,sll1234' or 'ref_seq:8001:9001' or batch file."
   ),
   make_option(
+    c("-S", "--samples"), type="character", default="",
+    help="Samples to plot, separated by comma, e.g. 'A,B,C' (default: all samples)."
+  ),
+  make_option(
     c("-F", "--facets"), action="store_true", default=F,
     help="Plot genes as facets."
   ),
@@ -58,6 +62,7 @@ if (opt$facets) {plot_type = "facets"}
 if (opt$operon) {plot_type = "operon"}
 shift = opt$shift
 cutoff = opt$cutoff
+samples_to_plot = opt$samples
 outfile = opt$outfile
 
 # # TESTING
@@ -76,6 +81,7 @@ message("Loading data...")
 
 # Use data.table library for faster loading
 suppressMessages(library(data.table))
+library(dplyr)
 
 if (dir.exists(indir)){
 
@@ -146,9 +152,14 @@ if (dir.exists(indir)){
   }
 }
 
-### SHIFT RPM VALUES ###########################################################
+# Filter to selected samples
+if (samples_to_plot != ""){
+  samples_to_plot = unlist(strsplit(samples_to_plot, ","))
+  rpm = filter(rpm, Sample %in% samples_to_plot)
+  gen = filter(gen, Sample %in% samples_to_plot)
+}
 
-library(dplyr)
+### SHIFT RPM VALUES ###########################################################
 
 if (shift) {
 
