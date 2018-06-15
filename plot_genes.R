@@ -601,28 +601,32 @@ plot_operon = function(genes){
     }
     if (nrow(filter(plot_data, Cut == 1))){
       if (!plot_ps){
+        cut_data = mutate(plot_data, RPM = ifelse(Cut == 1, RPM, 0))
         if (!plot_log10){
-          gp = gp + geom_col(
+          gp = gp + geom_bar(
             mapping=aes(x=Position, y=RPM, group=strand),
-            data=filter(plot_data, Cut == 1), fill="red"
+            data=cut_data, fill="red",
+            stat="identity"
           )
         }else{
           gp = gp + geom_point(
             mapping=aes(x=Position, y=RPM, group=strand),
-            data=filter(plot_data, Cut == 1), colour="red", size=0.2,
+            data=cut_data, colour="red", size=0.2,
             shape=4
           )
         }
       }else{
-        if (!plot_ps){
-          gp = gp + geom_col(
+        cut_data = mutate(plot_data, PS = ifelse(Cut == 1, PS, 0))
+        if (!plot_log10){
+          gp = gp + geom_bar(
             mapping=aes(x=Position, y=PS, group=strand),
-            data=filter(plot_data, Cut == 1), fill="red"
+            data=cut_data, fill="red",
+            stat="identity"
           )
         }else{
           gp = gp + geom_point(
             mapping=aes(x=Position, y=PS, group=strand),
-            data=filter(plot_data, Cut == 1), colour="red", size=0.2,
+            data=cut_data, colour="red", size=0.2,
             shape=4
           )
         }
