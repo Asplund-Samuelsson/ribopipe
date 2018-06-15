@@ -47,6 +47,10 @@ option_list = list(
     help="Plot pause score instead of RPM."
   ),
   make_option(
+    c("-l", "--log10"), action="store_true", default=F,
+    help="Plot with a log10 transformed y-axis."
+  ),
+  make_option(
     c("-o", "--outfile"), type="character", default="plot_genes.outfile.pdf",
     help="Output PDF file."
   )
@@ -69,6 +73,7 @@ cutoff = opt$cutoff
 samples_to_plot = opt$samples
 outfile = opt$outfile
 plot_ps = opt$pausescore
+plot_log10 = opt$log10
 
 # # TESTING
 # indir="/hdd/common/proj/RibosomeProfiling/results/2018-04-16/CSD2_seqmagick"
@@ -230,10 +235,22 @@ expand.genes = function(gdat){
   return(gdat_exp)
 }
 
+# Reverse log10 axis
+# https://stackoverflow.com/questions/11053899/how-to-get-a-reversed-log10-scale-in-ggplot2
+library(scales)
+reverselog_trans <- function(base = exp(1)) {
+    trans <- function(x) -log(x, base)
+    inv <- function(x) base^(-x)
+    trans_new(paste0("reverselog-", format(base)), trans, inv,
+              log_breaks(base = base),
+              domain = c(1e-100, Inf))
+}
+
 # Define strand color scale
 strandColors = c("#b35806", "#542788")
 names(strandColors) = c("+","-")
-colScale <- scale_fill_manual(name = "strand", values = strandColors)
+fillScale <- scale_fill_manual(name = "strand", values = strandColors)
+colScale <- scale_colour_manual(name = "strand", values = strandColors)
 
 ### FACETS PLOTTING FUNCTION ###################################################
 
@@ -309,18 +326,26 @@ plot_facets = function(genes){
   } else {
     gp = ggplot(grpm, aes(x=GenePosition, y=RPM, fill=strand))
   }
-  gp = gp + geom_bar(position=position_dodge(), stat="identity")
+  if (!plot_log10){
+    gp = gp + geom_col(position=position_dodge())
+    gp = gp + fillScale
+  }else{
+    gp = gp + geom_line(aes(colour=strand), size=0.1)
+    gp = gp + colScale
+  }
   gp = gp + theme_bw()
   gp = gp + facet_grid(Sample~Name, scales="free_x", space="free_x")
   gp = gp + scale_x_continuous(
     breaks = seq(0, max(grpm$GenePosition), 200),
     minor_breaks = seq(0, max(grpm$GenePosition), 20)
     )
+  if (plot_log10) {
+    gp = gp + scale_y_log10()
+  }
   gp = gp + theme(
     axis.text.x = element_text(angle = 60, hjust=1, vjust=1),
     strip.background = element_blank()
   )
-  gp = gp + colScale
   ggsave(outfile, gp, pdf, width=210/25.4, height=210/25.4)
 
 }
@@ -569,20 +594,38 @@ plot_operon = function(genes){
         colour="red", linetype="dashed", size=0.2
       )
     }
-    gp = gp + geom_bar(position=position_dodge(), stat="identity")
+    if (!plot_log10){
+      gp = gp + geom_col(position=position_dodge())
+    }else{
+      gp = gp + geom_line(aes(colour=strand), size=0.1)
+    }
     if (nrow(filter(plot_data, Cut == 1))){
       if (!plot_ps){
-        gp = gp + geom_bar(
-          mapping=aes(x=Position, y=RPM, group=strand),
-          data=filter(plot_data, Cut == 1), fill="red",
-          stat="identity"
-        )
+        if (!plot_log10){
+          gp = gp + geom_col(
+            mapping=aes(x=Position, y=RPM, group=strand),
+            data=filter(plot_data, Cut == 1), fill="red"
+          )
+        }else{
+          gp = gp + geom_point(
+            mapping=aes(x=Position, y=RPM, group=strand),
+            data=filter(plot_data, Cut == 1), colour="red", size=0.2,
+            shape=4
+          )
+        }
       }else{
-        gp = gp + geom_bar(
-          mapping=aes(x=Position, y=PS, group=strand),
-          data=filter(plot_data, Cut == 1), fill="red",
-          stat="identity"
-        )
+        if (!plot_ps){
+          gp = gp + geom_col(
+            mapping=aes(x=Position, y=PS, group=strand),
+            data=filter(plot_data, Cut == 1), fill="red"
+          )
+        }else{
+          gp = gp + geom_point(
+            mapping=aes(x=Position, y=PS, group=strand),
+            data=filter(plot_data, Cut == 1), colour="red", size=0.2,
+            shape=4
+          )
+        }
       }
     }
     if(exists("gr")){
@@ -613,7 +656,11 @@ plot_operon = function(genes){
     }
     # Set up y axis
     if (cutoff){
-      y_axis_limits = c(0, cutoff)
+      if (!plot_ps){
+        y_axis_limits = c(0, min(cutoff, max(grpm$RPM)*1.05))
+      }else{
+        y_axis_limits = c(0, min(cutoff, max(grpm$PS)*1.05))
+      }
     }else{
       if (!plot_ps) {
         y_axis_limits = c(0, max(grpm$RPM)*1.05)
@@ -621,12 +668,34 @@ plot_operon = function(genes){
         y_axis_limits = c(0, max(grpm$PS)*1.05)
       }
     }
-    if((!x_reverse & S == "-") | (x_reverse & S == "+")){
-      gp = gp + scale_y_reverse(limits=rev(y_axis_limits))
-    }else{
-      gp = gp + scale_y_continuous(limits=y_axis_limits)
+    if (plot_log10){
+      if (!plot_ps){
+        y_axis_limits[1] = min(filter(grpm, RPM > 0)$RPM)
+      }else{
+        y_axis_limits[1] = min(filter(grpm, PS > 0)$PS)
+      }
     }
-    gp = gp + colScale
+    if((!x_reverse & S == "-") | (x_reverse & S == "+")){
+      if (!plot_log10){
+        gp = gp + scale_y_reverse(limits=rev(y_axis_limits))
+      }else{
+        gp = gp + scale_y_continuous(
+          trans=reverselog_trans(10),
+          limits = rev(y_axis_limits)
+        )
+      }
+    }else{
+      if (!plot_log10){
+        gp = gp + scale_y_continuous(limits=y_axis_limits)
+      }else{
+        gp = gp + scale_y_log10(limits=y_axis_limits)
+      }
+    }
+    if (!plot_log10){
+      gp = gp + fillScale
+    }else{
+      gp = gp + colScale
+    }
     # Remove x axis decorations
     gp = gp + theme(
       axis.title.x = element_blank(),
@@ -671,7 +740,7 @@ plot_operon = function(genes){
     gp = gp + theme(axis.title.y=element_blank(),
                     axis.text.y=element_blank(),
                     axis.ticks.y=element_blank())
-    gp = gp + colScale
+    gp = gp + fillScale
     gp = gp + guides(fill=F, colour=F)
     gp_genes = gp@ggplot # @ggplot FOR PLOTTING WITH REGULAR GGPLOT OBJECTS
   }else{
