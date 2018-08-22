@@ -48,8 +48,8 @@ bowtie_8_ref="/ssd/common/tools/ribopipe/reference_sequences/syn_PCC6803/NC_0009
 
 # Step 9: Count the number of reads on read-occupied positions in genome (PARALLEL)
 readCountScript="/ssd/common/tools/ribopipe/python/readCountScript.max48.sup2.3prime_mod.py"
-min_length="23"
-max_length="48"
+min_length="25"
+max_length="100"
 
 # Step 10: Calculate total number of mapped reads
 totalNbrMappedReadsScript="/ssd/common/tools/ribopipe/python/totalNbrMappedReadsScript.sup3.py"
