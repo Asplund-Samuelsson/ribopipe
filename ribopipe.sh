@@ -32,6 +32,7 @@ if [[ START_STEP -le S ]]
     # Set up remaining output subdirectories automatically
     mkdir qualityCheck cutadapt lengthDistr highQuality
     mkdir tANDrRNAremoval mapped readcount RPM readsPerGene
+    mkdir analysis
 
     # Report step done
     echo -e "\n\e[92mStep $S: Done.\e[0m\n"
@@ -525,6 +526,48 @@ if [[ START_STEP -le S ]]
 
     # Run reads per gene counting in parallel for the input files
     parallel --no-notice --jobs $THREADS run_genes ::: ${input_files_13[@]}
+
+    # Report step done
+    echo -e "\n\e[92mStep $S: Done.\e[0m\n"
+  else
+    # Report skip
+    echo -e "\n\e[31mStep $S: Skipping...\e[0m\n"
+fi
+
+
+################################################################################
+# Step 14: Create CDS RPKM table
+S=14
+
+# Check starting step
+if [[ START_STEP -le S ]]
+  then
+    # Report progress
+    echo -e "\n\e[94mStep $S: Creating CDS RPKM table...\e[0m\n"
+
+    # Run script
+    $table_script $GENE_LIST $SHIFT
+
+    # Report step done
+    echo -e "\n\e[92mStep $S: Done.\e[0m\n"
+  else
+    # Report skip
+    echo -e "\n\e[31mStep $S: Skipping...\e[0m\n"
+fi
+
+
+################################################################################
+# Step 15: Plot average gene profiles
+S=15
+
+# Check starting step
+if [[ START_STEP -le S ]]
+  then
+    # Report progress
+    echo -e "\n\e[94mStep $S: Plotting average gene profiles...\e[0m\n"
+
+    # Run script
+    $profile_script $GENE_LIST $SHIFT
 
     # Report step done
     echo -e "\n\e[92mStep $S: Done.\e[0m\n"

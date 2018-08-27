@@ -193,6 +193,6 @@ gen$RPKM = 1000 * gen$RPM / gen$Length
 
 write.table(
   gen,
-  "analysis/gene_RPKM.tab",
+  "analysis/all_CDS_RPKM_no_filter.tab",
   quote=F, sep="\t", row.names=F, col.names=T
   )
