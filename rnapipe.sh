@@ -30,8 +30,8 @@ if [[ START_STEP -le S ]]
     echo -e "\n\e[94mStep $S: Setting up output directory...\e[0m\n"
 
     # Set up remaining output subdirectories automatically
-    mkdir \
-    cutadapt highQuality tANDrRNAremoval mapped readcount RPM readsPerGene
+    mkdir cutadapt highQuality tANDrRNAremoval mapped
+    mkdir readcount RPM readsPerGene analysis
 
     # Report step done
     echo -e "\n\e[92mStep $S: Done.\e[0m\n"
@@ -475,6 +475,27 @@ if [[ START_STEP -le S ]]
 
     # Run reads per gene counting in parallel for the input files
     parallel --no-notice --jobs $THREADS run_genes ::: ${input_files_11[@]}
+
+    # Report step done
+    echo -e "\n\e[92mStep $S: Done.\e[0m\n"
+  else
+    # Report skip
+    echo -e "\n\e[31mStep $S: Skipping...\e[0m\n"
+fi
+
+
+################################################################################
+# Step 12: Create CDS RPKM table
+S=12
+
+# Check starting step
+if [[ START_STEP -le S ]]
+  then
+    # Report progress
+    echo -e "\n\e[94mStep $S: Creating CDS RPKM table...\e[0m\n"
+
+    # Run script
+    $table_script $GENE_LIST
 
     # Report step done
     echo -e "\n\e[92mStep $S: Done.\e[0m\n"

@@ -5,7 +5,9 @@ EXPERIMENT_NAME="ExperimentName"
 OUTDIR="YYYY.MM.DD.${EXPERIMENT_NAME}"
 THREADS="16"
 START_STEP=1
-GENOME_FASTA="/ssd/common/tools/ribopipe/reference_sequences/syn_PCC6803/NC_000911.1_chr_7plasmids.fasta"
+RIBODIR="/ssd/common/tools/ribopipe/"
+GENOME_FASTA="${RIBODIR}/reference_sequences/syn_PCC6803/NC_000911.1_chr_7plasmids.fasta"
+GENE_LIST="${RIBODIR}/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist_full.tab"
 
 # Step-specific options
 
@@ -31,7 +33,7 @@ sickle_l="6"
 bowtie_5_n="2"
 bowtie_5_l="28"
 bowtie_5_p="10"
-bowtie_5_ref="/ssd/common/tools/ribopipe/reference_sequences/syn_PCC6803/rRNAtRNA.syn6803.NC000911"
+bowtie_5_ref="${RIBODIR}/reference_sequences/syn_PCC6803/rRNAtRNA.syn6803.NC000911"
 
 # Step 6: Map reads to the genome
 reverse_complement=true # Make input reads reverse-complement for e.g. NEBNext Directional
@@ -39,21 +41,24 @@ bowtie_6_m="1"
 bowtie_6_n="2"
 bowtie_6_l="28"
 bowtie_6_p="10"
-bowtie_6_ref="/ssd/common/tools/ribopipe/reference_sequences/syn_PCC6803/NC_000911.1_chr_7plasmids"
+bowtie_6_ref="${RIBODIR}/reference_sequences/syn_PCC6803/NC_000911.1_chr_7plasmids"
 
 # Step 7: Count the number of reads on read-occupied positions in genome (PARALLEL)
-readCountScript="/ssd/common/tools/ribopipe/python/readCountScript.max48.sup2.RNAseq_mod.py"
+readCountScript="${RIBODIR}/python/readCountScript.max48.sup2.RNAseq_mod.py"
 
 # Step 8: Calculate total number of mapped reads
-totalNbrMappedReadsScript="/ssd/common/tools/ribopipe/python/totalNbrMappedReadsScript.sup3.py"
+totalNbrMappedReadsScript="${RIBODIR}/python/totalNbrMappedReadsScript.sup3.py"
 
 # Step 9: Calculate RPM on read-occupied positions in genome
-RPMscript="/ssd/common/tools/ribopipe/python/RPMscript.sup6.py"
+RPMscript="${RIBODIR}/python/RPMscript.sup6.py"
 
 # Step 10: Complete RPM list by assigning “0” to all unoccupied positions
-RPMcompleteScript="/ssd/common/tools/ribopipe/python/RPMcompleteScript.sup7.edited.py"
+RPMcompleteScript="${RIBODIR}/python/RPMcompleteScript.sup7.edited.py"
 
 # Step 11: Count the number of reads on every gene
-readsPerGeneScript="/ssd/common/tools/ribopipe/python/readsPerGeneScript.sup4.edited.py"
-genelistP="/ssd/common/tools/ribopipe/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist.p"
-genelistM="/ssd/common/tools/ribopipe/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist.m"
+readsPerGeneScript="${RIBODIR}/python/readsPerGeneScript.sup4.edited.py"
+genelistP="${RIBODIR}/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist.p"
+genelistM="${RIBODIR}/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist.m"
+
+# Step 12: Create CDS RPKM table
+table_script="${RIBODIR}/R/create_gene_rpkm_table.rnapipe.R"
