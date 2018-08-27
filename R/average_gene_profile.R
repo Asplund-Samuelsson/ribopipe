@@ -6,7 +6,7 @@
 indir="."
 args = commandArgs(trailingOnly=T)
 genelist_file = args[1]
-shift = args[2]
+shift = as.numeric(args[2])
 # indir = "/hdd/common/proj/RibosomeProfiling/results/2018-04-16/CSD2_seqmagick"
 # genelist_file = "tools/ribopipe/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist_full.tab"
 # shift = -12

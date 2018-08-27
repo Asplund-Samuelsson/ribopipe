@@ -5,7 +5,7 @@
 # Load command line arguments
 args = commandArgs(trailingOnly=T)
 genelist_file = args[1]
-shift = args[2]
+shift = as.numeric(args[2])
 indir = "." # A ribopipe results directory
 
 # List RPM0 filenames
