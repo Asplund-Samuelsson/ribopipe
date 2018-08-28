@@ -569,6 +569,9 @@ if [[ START_STEP -le S ]]
     # Run script
     $profile_script $GENE_LIST $SHIFT
 
+    # Compress large output file
+    pigz analysis/gene_PauseScore_profiles.all_genes.tab
+
     # Report step done
     echo -e "\n\e[92mStep $S: Done.\e[0m\n"
   else
