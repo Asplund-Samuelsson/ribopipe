@@ -337,3 +337,68 @@ gp = gp + coord_fixed()
 outfile = paste(dirname(rp_file), "rp_PCA_clustering_of_genes.pdf", sep="/")
 
 ggsave(outfile, gp, height=50/2.54, width=60/2.54)
+
+################################################################################
+
+# Add colours based on clusters from Jan
+cluster_file = "/home/johannes/proj/ribo/data/2018-10-09/day-night_RPF_clusters_from_Jan.csv"
+cl = read.table(cluster_file, sep=",", header=T, stringsAsFactors=F)
+cl = select(cl, Name, Cluster = k4)
+cl = mutate(cl, Cluster = as.character(Cluster))
+
+plot_rp_highz = inner_join(plot_rp_highz, cl)
+
+# Plot it
+gp = ggplot(plot_rp_highz, aes(x=PC1, y=PC2, colour=Cluster, label=Name, group=Cluster))
+gp = gp + geom_point()
+gp = gp + scale_colour_manual(values=colours)
+gp = gp + geom_text_repel(force=3, size=4)
+gp = gp + geom_segment(
+  data=sample_arrows_rp_highz,
+  mapping=aes(xend=PC1, yend=PC2, label=NA, group=NA),
+  colour="#fc4e2a", x=0, y=0, arrow = arrow(length=unit(0.2, "cm"))
+)
+gp = gp + geom_text_repel(
+  data=sample_arrows_rp_highz,
+  mapping=aes(x=PC1, y=PC2, label=Sample, group=NA),
+  colour="#fc4e2a", min.segment.length=10
+)
+#gp = gp + geom_density2d()
+gp = gp + theme_bw()
+gp = gp + coord_fixed()
+
+outfile = paste(dirname(rp_file), "rp_PCA_clustering_of_genes.cluster_colors.pdf", sep="/")
+
+ggsave(outfile, gp, height=40/2.54, width=48/2.54)
+
+# Save one with all genes as well
+rp_pca_x = as.data.frame(rp_pca$x) %>% select(PC1, PC2, PC3)
+rp_pca_x$Name = rownames(rp_pca_x)
+
+rp_pca_x = inner_join(rp_pca_x, cl)
+
+sample_arrows_rp_pca_x = as.data.frame(rp_pca$rotation * 3)
+sample_arrows_rp_pca_x$Sample = rownames(sample_arrows_rp_pca_x)
+
+
+# Plot it
+gp = ggplot(rp_pca_x, aes(x=PC1, y=PC2, colour=Cluster, label=Name, group=Cluster))
+gp = gp + scale_colour_manual(values=colours)
+gp = gp + geom_point(alpha=0.5)
+gp = gp + geom_segment(
+  data=sample_arrows_rp_pca_x,
+  mapping=aes(xend=PC1, yend=PC2, label=NA, group=NA),
+  colour="#fc4e2a", x=0, y=0, arrow = arrow(length=unit(0.2, "cm"))
+)
+gp = gp + geom_text_repel(
+  data=sample_arrows_rp_pca_x,
+  mapping=aes(x=PC1, y=PC2, label=Sample, group=NA),
+  colour="#fc4e2a", min.segment.length=10
+)
+#gp = gp + geom_density2d()
+gp = gp + theme_bw()
+gp = gp + coord_fixed()
+
+outfile = paste(dirname(rp_file), "rp_PCA_clustering_of_genes.cluster_colors.all_genes.pdf", sep="/")
+
+ggsave(outfile, gp, height=25/2.54, width=30/2.54)
