@@ -81,12 +81,18 @@ rna$Length = ifelse(rna$Start > 0, rna$Length, rna$End - rna$Start)
 rna$RPKM = 1000 * rna$RPM / rna$Length
 
 # Subset to coding sequences only
-rna = subset(rna, Name %in% subset(gene_types, Type == "CDS")$Name)
+rna_CDS = subset(rna, Name %in% subset(gene_types, Type == "CDS")$Name)
 
 ### WRITE TABLE ################################################################
 
 write.table(
-  rna,
+  rna_CDS,
   "analysis/all_CDS_RPKM_no_filter.tab",
+  quote=F, sep="\t", row.names=F, col.names=T
+  )
+
+write.table(
+  rna,
+  "analysis/all_genes_RPKM_no_filter.tab",
   quote=F, sep="\t", row.names=F, col.names=T
   )
