@@ -62,3 +62,4 @@ genelistM="${RIBODIR}/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist.m
 
 # Step 12: Create CDS RPKM table
 table_script="${RIBODIR}/R/create_gene_rpkm_table.rnapipe.R"
+pca_script="${RIBODIR}/R/simple_3D-PCA_clustering_of_samples.R"

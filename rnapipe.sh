@@ -492,10 +492,13 @@ S=12
 if [[ START_STEP -le S ]]
   then
     # Report progress
-    echo -e "\n\e[94mStep $S: Creating CDS RPKM table...\e[0m\n"
+    echo -e "\n\e[94mStep $S: Creating CDS RPKM table and performing PCA...\e[0m\n"
 
     # Run script
     $table_script $GENE_LIST
+
+    # Perform PCA
+    $pca_script ./analysis/all_CDS_RPKM_no_filter.tab
 
     # Report step done
     echo -e "\n\e[92mStep $S: Done.\e[0m\n"
