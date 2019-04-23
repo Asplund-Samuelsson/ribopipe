@@ -69,7 +69,8 @@ genelistP="${RIBODIR}/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist.p
 genelistM="${RIBODIR}/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist.m"
 
 # Step 14: Create CDS RPKM table
-table_script="${RIBODIR}/R/create_gene_rpkm_table.R"
+table_script_CDS="${RIBODIR}/R/create_gene_rpkm_table.R"
+table_script_all="${RIBODIR}/R/create_gene_rpkm_table_all_genes.R"
 
 # Step 15: Plot average gene profiles
 profile_script="${RIBODIR}/R/average_gene_profile.R"

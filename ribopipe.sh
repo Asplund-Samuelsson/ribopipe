@@ -536,17 +536,18 @@ fi
 
 
 ################################################################################
-# Step 14: Create CDS RPKM table
+# Step 14: Create RPKM tables. One for all genes, one for CDSs only.
 S=14
 
 # Check starting step
 if [[ START_STEP -le S ]]
   then
     # Report progress
-    echo -e "\n\e[94mStep $S: Creating CDS RPKM table...\e[0m\n"
+    echo -e "\n\e[94mStep $S: Creating RPKM tables...\e[0m\n"
 
-    # Run script
-    $table_script $GENE_LIST $SHIFT
+    # Run scripts
+    $table_script_CDS $GENE_LIST $SHIFT
+    $table_script_all $GENE_LIST $SHIFT
 
     # Report step done
     echo -e "\n\e[92mStep $S: Done.\e[0m\n"

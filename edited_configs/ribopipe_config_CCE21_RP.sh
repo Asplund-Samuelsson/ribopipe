@@ -4,7 +4,7 @@
 EXPERIMENT_NAME="CCE2"
 OUTDIR="2019.04.14.${EXPERIMENT_NAME}"
 THREADS="16"
-START_STEP=1 # Auto-stop after step 5 unless skipped. Continue from step 6.
+START_STEP=14 # Auto-stop after step 5 unless skipped. Continue from step 6.
 HALT_S5=1
 RIBODIR="/ssd/common/tools/ribopipe/"
 GENOME_FASTA="${RIBODIR}/reference_sequences/syn_PCC6803/NC_000911.1_chr_7plasmids.fasta"
@@ -69,7 +69,8 @@ genelistP="${RIBODIR}/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist.p
 genelistM="${RIBODIR}/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist.m"
 
 # Step 14: Create CDS RPKM table
-table_script="${RIBODIR}/R/create_gene_rpkm_table.R"
+table_script_CDS="${RIBODIR}/R/create_gene_rpkm_table.R"
+table_script_all="${RIBODIR}/R/create_gene_rpkm_table_all_genes.R"
 
 # Step 15: Plot average gene profiles
 profile_script="${RIBODIR}/R/average_gene_profile.R"
