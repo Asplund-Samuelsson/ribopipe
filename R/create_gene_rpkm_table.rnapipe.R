@@ -7,6 +7,10 @@ args = commandArgs(trailingOnly=T)
 RNAdir = "."
 genelist_file = args[1]
 
+# # Load command arguments manually
+# RNAdir = "/hdd/common/proj/RNAseq/results/2018-09-14_CCE1/2018.06.11.CCE1_RNAseq"
+# genelist_file = "/ssd/common/tools/ribopipe/genelists/syn_PCC6803/NC_000911.1_chr_7plasmids.genelist_full.tab"
+
 # List readsPerGene filenames
 rna_files = list.files(
   path=paste(c(RNAdir, "/readsPerGene"), collapse=""),
@@ -65,11 +69,23 @@ colnames(gene_types)[grep("Old", colnames(gene_types))] = "Name"
 
 ### NORMALIZE ##################################################################
 
+# Calculate the total number of reads on all genes in each sample
+tc_rna = merge(tc_rna, aggregate(Reads~Sample, rna, sum))
+colnames(tc_rna)[3] = "totalReads_genes"
+
+# Calculate the total number of reads on CDSs in each sample
+tc_rna = merge(
+  tc_rna,
+  aggregate(Reads~Sample,
+            subset(rna, Name %in% subset(gene_types, Type == "CDS")$Name),
+            sum))
+colnames(tc_rna)[4] = "totalReads_orf"
+
 # Add total count to per-gene RPM data
 rna = merge(rna, tc_rna)
 
 # Calculate RPM
-rna$RPM = rna$Reads * 1000000 / rna$TotalReads
+rna$RPM = rna$Reads * 1000000 / rna$totalReads_genes
 
 # Calculate gene length
 rna$Length = rna$End - rna$Start + 1
@@ -82,6 +98,12 @@ rna$RPKM = 1000 * rna$RPM / rna$Length
 
 # Subset to coding sequences only
 rna_CDS = subset(rna, Name %in% subset(gene_types, Type == "CDS")$Name)
+
+# Recalculate RPM and RPKM. scalingfactor = totalReads_orf. 
+rna_CDS$RPM = rna_CDS$RPM * rna_CDS$totalReads_genes /
+  rna_CDS$totalReads_orf
+rna_CDS$RPKM = rna_CDS$RPKM * rna_CDS$totalReads_genes /
+  rna_CDS$totalReads_orf
 
 ### WRITE TABLE ################################################################
 
