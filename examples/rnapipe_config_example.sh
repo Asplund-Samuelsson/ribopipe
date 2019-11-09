@@ -3,7 +3,7 @@
 # Universal options
 EXPERIMENT_NAME="RNAseq"
 OUTDIR="examples/${EXPERIMENT_NAME}"
-THREADS="4"
+THREADS="2"
 START_STEP=1
 RIBODIR="../.."
 GENOME_FASTA="${RIBODIR}/reference_sequences/syn_PCC6803/NC_000911.1_chr_7plasmids.fasta"
