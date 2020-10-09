@@ -1,3 +1,5 @@
+![alt text](ribopipe.png "Ribosome profiling pipeline")
+
 # ribopipe
 
 RNA-Seq and Ribo-Seq (ribosome profiling) data workup pipelines
