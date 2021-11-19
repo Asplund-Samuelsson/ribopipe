@@ -115,4 +115,4 @@ Note that this is configured for 16 parallel processes (10 cores in the bowtie m
 
 Jan Karlsen, KTH (jan.karlsen@scilifelab.se)
 
-Johannes Asplund-Samuelsson, KTH (johannes.asplund.samuelsson@scilifelab.se)
+Johannes Asplund-Samuelsson (johannes.aspsam@gmail.com)
